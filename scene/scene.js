@@ -122,7 +122,7 @@ function init(host) {
       orbitClock();
       return;
     }
-    if (!timer && inView && !hidden) timer=requestAnimationFrame(draw);
+    if (!timer && !hidden) timer=requestAnimationFrame(draw);
   }
 
   function staticMode(){
@@ -202,7 +202,7 @@ function init(host) {
 
   function draw(now){
     timer=0;
-    if(!renderer||!inView||hidden)return;
+    if(!renderer||hidden||(!inView&&!dirty))return;
     const dt=last ? Math.min(.05,(now-last)/1000) : 0;
     last=now;
     const rotating=Math.abs(goal-angle)>.0005;
@@ -221,7 +221,7 @@ function init(host) {
       poster.style.opacity='0';
       dirty=false;
     }
-    if(!paused||rotating) timer=requestAnimationFrame(draw);
+    if(inView&&(!paused||rotating)) timer=requestAnimationFrame(draw);
   }
 
   function rotateStep(direction){
@@ -289,6 +289,6 @@ function init(host) {
     if(inView&&!requested){requested=true;createRenderer();}
     last=0;refresh();
   },{rootMargin:'48px'});
-  observer.observe(host);
+  observer.observe(host.closest('.model') || host);
   states();
 }
