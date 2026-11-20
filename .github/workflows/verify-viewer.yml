@@ -1,0 +1,22 @@
+name: Verify published 3D viewer
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser test driver
+        run: npm install --prefix "$RUNNER_TEMP/viewer-test" --no-audit --no-fund playwright-core@1.56.1
+      - name: Test the live GitHub Pages site in Chrome
+        env:
+          SITE_URL: https://frantisekdron.github.io/rtk-logistic-3d/
+        run: NODE_PATH="$RUNNER_TEMP/viewer-test/node_modules" node tests/viewer.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: viewer-screenshots
+          path: viewer-results
+          if-no-files-found: ignore
