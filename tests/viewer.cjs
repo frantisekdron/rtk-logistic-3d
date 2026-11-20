@@ -45,7 +45,10 @@ async function verify(browser, {name, mobile, fallback}) {
     const signature = async () => digest(await canvas.screenshot());
     const first = await signature();
     const changed = async old => {
+      await model.scrollIntoViewIfNeeded();
       for(let i=0;i<12;i++) {if(await signature()!==old)return;}
+      await page.screenshot({path:artifacts+'/'+name+'-failure.png',fullPage:true});
+      console.log('STATE',await model.evaluate(el=>({state:el.dataset.sceneState,paused:el.dataset.paused,rect:el.getBoundingClientRect().toJSON(),time:document.querySelector('[data-scene-time]').value,scrollY})));
       assert.fail('Model pixels did not change after the interaction');
     };
     await page.locator('[data-camera-angle]').fill('45');await changed(first);
