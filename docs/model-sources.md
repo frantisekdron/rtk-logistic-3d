@@ -8,7 +8,7 @@ Model vychází z fotografií původního webu RTK, zachovaných v `puvodni/img/
 
 ## Partneři
 
-BAUHAUS, OBI, Baumax, Hornbach, Globus a Tesco jsou výslovně uvedeny v původní stránce RTK „Servis DIY“, zachované v `puvodni/servis-diy.html` (oddíl DIY). Značky v novém pásu jsou vysázené jako text; nejde o oficiální logotypové soubory. Historický seznam sám nepotvrzuje trvání všech smluv k dnešnímu dni.
+BAUHAUS, OBI, Baumax, Hornbach, Globus a Tesco jsou výslovně uvedeny v původní stránce RTK „Servis DIY“, zachované v `puvodni/servis-diy.html` (oddíl DIY). Pás používá originální SVG loga z oficiálních českých webů partnerů, viz `partner-logos.md`. Historický seznam sám nepotvrzuje trvání všech smluv k dnešnímu dni.
 
 ## Provoz a úpravy
 
