@@ -1,0 +1,368 @@
+@charset "utf-8";
+/* CSS Document - RTK Logistic */
+
+/******************************
+
+	global
+
+******************************/
+html, body, div, span, h1, h2, h3, h4, h5, h6, ol, ul, li, dl, dt, dd, caption, table, tr, th, td, thead, tbody, tfoot, p, blockquote, cite, q, abbr, acronym, address, a, em, strong, img, ins, del, dfn, kbd, pre, xmp, code, form, fieldset, legend, label, object { padding: 0; margin: 0; }
+body { font: 13px Arial, Helvetica, sans-serif; color: #444; background: #ffffff url("../img/pozadi.jpg"); background-repeat: no-repeat; background-position: top center; }
+body.tisk { font: 13px Arial, Helvetica, sans-serif; color: #444; background: #ffffff url("../img/blank.gif"); }
+body.okno { font: 13px Arial, Helvetica, sans-serif; color: #444; background: #ffffff url("../img/blank.gif"); padding: 20px; }
+
+a { color: #078A22; text-decoration: underline; }
+a:hover { color: #061D90; text-decoration: underline; }
+a img { border: none; }
+hr { display: none; }
+.left { float: left; }
+.right { float: right; }
+.clear { clear: both; line-height: 0; height: 0; }
+.hidden { position: absolute; left: -66666px; }
+.center { text-align: center; }
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+.bold { font-weight: bold; }
+.strike { text-decoration: line-through; }
+.pismo-male { font: 10px Arial, Helvetica, sans-serif; }
+.nadpis-pozadi { background-color: #F4D7D6; }
+#iframe { border: 0px; width: 0px; height: 0px; }
+.cervena { color: #C83428; }
+
+/* overlapping */
+.overlap { position: relative; overflow: hidden; }
+.overlap span { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-position: 0 0; background-repeat: no-repeat; }
+.overlap a span,
+a.overlap span { cursor: pointer; }
+
+
+/******************************
+
+	layout
+
+******************************/
+#page-wrapper { width: 990px; margin: auto; position: relative; padding: 0px; padding-top: 540px; }
+body.admin #page-wrapper { width: 990px; margin: auto; position: relative; padding: 0px; padding-top: 160px; }
+#left-column { float: left; width: 200px; padding-left: 15px; }
+#left-column-cele { float: left; width: 0px; }
+#content { float: right; width: 720px; margin-right: 25px; }
+#content-menu-bg { background: url("../img/content-menu-bg.gif"); }
+
+
+
+
+
+
+/******************************
+
+	header
+
+******************************/
+#header { position: absolute; top: 0; width: 990px; height: 120px; background: url("../img/header-bg.png"); background-repeat: no-repeat; background-position: top right; }
+#logo { float: left; width: 280px; height: 120px; padding: 0px; margin: 0px; background: url("../img/header-logo.gif"); background-repeat: no-repeat; }
+#logo-nadpis { position: absolute; top: 41px; left: 300px; font-family: Trebuchet MS, Arial, Helvetica, sans-serif; color: #078A22; font-size: 32px; font-style: italic; }
+#logo-pecet { position: absolute; top: 27px; right: 150px; font-family: Trebuchet MS, Arial, Helvetica, sans-serif; color: #ffffff; font-size: 35px; font-weight: bold; }
+#topmenu { float: left; width: 685px; text-align: right; }
+#topmenu-odkazy { float: right; }
+a.topmenu-odkaz { float: left; width: 28px; height: 22px; line-height: 22px; background-color: #bdbdbd; font-size: 11px; color: #000000; text-decoration: none; text-align: center; margin-left: 3px; }
+a.topmenu-odkaz:hover { background-color: #283ea9; color: #ffffff; }
+a.topmenu-odkaz-aktivni { float: left; width: 28px; height: 22px; line-height: 22px; background-color: #078a22; font-size: 11px; color: #ffffff; text-decoration: none; text-align: center; margin-left: 3px; }
+a.topmenu-odkaz-aktivni:hover { background-color: #283ea9; color: #ffffff; }
+#header-motiv { position: absolute; top: 160px; width: 990px; height: 380px; }
+#header-motiv-vlevo { float: left; width: 25px; background-image: url("../img/header-motiv-vlevo-bg.png"); background-repeat: no-repeat; }
+#header-motiv-stred { float: left; width: 940px; }
+#header-motiv-vpravo { float: left; width: 25px; background-image: url("../img/header-motiv-vpravo-bg.png"); background-repeat: no-repeat; }
+#header-nadpis { position: absolute; display: block; left: 0px; top: 380px; width: 295px; height: 116px; background-image: url("../img/header-nadpis-bg.png"); background-repeat: no-repeat; text-align: center; }
+#header-nadpis-obsah { font-family: Trebuchet MS,Arial; font-size: 36px; font-weight: bold; font-style: italic; color: #061D90; line-height: 100px; }
+
+
+
+
+
+/******************************
+
+	menu
+
+******************************/
+
+#nav { position: absolute; top: 120px; width: 990px; height: 40px; background: #061D90 url("../img/menu-bg.gif"); list-style: none; }
+#nav li { float: left; margin: 0; list-style-type: none;  }
+#nav li.hlavni { padding: 0; text-transform: uppercase; }
+#nav li a.hlavni-odkaz { padding: 0px; line-height: 40px; display: block; }
+#nav li a { font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: bold; color: #FFFFFF; text-decoration: none; }
+#nav li:hover ul, #nav li.sfhover ul { left: auto; }
+#nav li.odkaz a.hlavni-odkaz { text-align: center; padding-left: 22px; padding-right: 21px; background: url("../img/menu-odkaz-bg.gif"); background-repeat: no-repeat; }
+#nav li.odkaz a.hlavni-odkaz:hover { background-color: #2BA744; color: #FFFFFF; }
+#nav li.odkaz-prvni a.hlavni-odkaz { margin-left: 25px; text-align: center; padding-left: 22px; padding-right: 22px; background: url("../img/blank.gif"); }
+#nav li.odkaz-prvni a.hlavni-odkaz:hover { background-color: #2BA744; color: #FFFFFF; }
+
+/* second-level lists */
+#nav li ul { position: absolute; left: -999em; width: 211px; height: auto; margin: 0px;  padding: 0px; background: #f5f5f5; display: block; list-style: none; z-index: 100; }
+#nav li li.prvni { margin: 0; padding: 0; width: 210px; 10px; font-size: 12px; border: 1px solid #d1d1d1; }
+#nav li li.prvni-sipka { margin: 0; padding: 0; width: 210px; 10px; font-size: 12px; border: 1px solid #d1d1d1; background: #f5f5f5 none 0 0 repeat-x; }
+#nav li li { margin: 0; padding: 0; width: 210px; font-size: 12px; border-bottom: 1px solid #d1d1d1; border-left: 1px solid #d1d1d1; border-right: 1px solid #d1d1d1; }
+#nav li li a, #nav li li a:visited { display: block; width: 190px; padding: 0px; padding-left: 10px; padding-right: 10px; line-height: 28px; color: #605d5c; text-decoration: none; font-size: 12px; font-weight: normal; }
+#nav li li.sipka { margin: 0; padding: 0; width: 210px; font-size: 12px; border-bottom: 1px solid #d1d1d1; border-left: 1px solid #d1d1d1; border-right: 1px solid #d1d1d1; background: #f5f5f5 none 0 0 repeat-x; }
+#nav li li a.pododkaz { font-family: Arial, Helvetica, sans-serif; font-weight: bold; }
+#nav li li a:hover { background: #6D6D6D; color: #ffffff; }
+#nav li li.prvni-sipka a.pododkaz:hover { background: #C02F2A; color: #ffffff; background: #f5f5f5 none 0 0 repeat-x; }
+#nav li li.sipka a.pododkaz:hover { background: #C02F2A; color: #ffffff; background: #f5f5f5 none 0 0 repeat-x; }
+
+/* third-level lists */
+#nav, #nav ul { padding: 0; margin: 0; list-style: none;  line-height: 1; }
+#nav li:hover ul ul, #nav li.sfhover ul ul { left: -999em; }
+#nav li:hover ul, #nav li li:hover ul, #nav li.sfhover ul, #nav li li.sfhover ul { left: auto; }
+#nav li ul ul{ margin: -27px 0 0 210px; }
+
+*>html #navblock ul {f\loat: right;margin-top:11px;} /*IE 5 Mac hack  */
+*>html #nav a {f\loat: left;} /*IE 5 Mac hack */
+
+
+
+
+
+
+/******************************
+
+	left column
+
+******************************/
+#left-column { width: 190px; margin-left: 30px; padding-bottom: 20px; padding-top: 40px; }
+#left-menu { margin-bottom: 20px; }
+#left-menu ul { list-style: none; }
+#left-menu li { padding: 0px; }
+#left-menu li a { display: block; font-size: 12px; color: #FFFFFF; font-weight: bold; text-decoration: none; width: 160px; line-height: 25px; padding: 0px; padding-left: 20px; padding-right: 20px; background-color: #2BA744; border-top: 1px solid #0A7E22; margin-bottom: 5px; }
+#left-menu li a.aktivni { display: block; font-size: 12px; color: #454545; font-weight: bold; text-decoration: none; width: 160px; line-height: 25px; padding: 0px; padding-left: 20px; padding-right: 20px; background-color: #283EA9; border-top: 1px solid #061D90; margin-bottom: 5px; }
+#left-menu li a:hover { background-color: #283EA9; border-top: 1px solid #061D90; }
+#box-kontakt-nadpis { width: 200px; background-color: #d22f2e; padding: 0px; font-family: Trebuchet MS, Arial; font-size: 11px; color: #FFFFFF; font-weight: bold; border-bottom: 1px solid #FFFFFF; }
+#box-kontakt-nadpis-obsah { padding-left: 20px; padding-right: 20px; padding-top: 4px; padding-bottom: 4px; }
+#box-kontakt-text { width: 200px; background-image: url("../img/box-kontakt-bg.jpg"); background-color: #FFFFFF; background-repeat: no-repeat; padding: 0px; font-family: Trebuchet MS, Arial; font-size: 11px; color: #000000; }
+#box-kontakt-text-obsah { padding: 15px; padding-left: 20px; }
+#box-kontakt2-text-obsah { padding: 15px; padding-right: 10px; }
+.tbl-box-kontakt { padding: 0px; margin: 0px; border-collapse: collapse; }
+.tbl-box-kontakt td { padding: 1px; margin: 0px; text-align: left; }
+.tbl-box-kontakt td input.input { width: 160px; }
+.tbl-box-kontakt td textarea.input { width: 160px; height: 60px; }
+.tbl-box-kontakt td input.input-kod { width: 80px; margin-right: 10px; }
+.tbl-box-kontakt td input.submit { margin-top: 5px; }
+
+
+
+
+/******************************
+
+	content
+
+******************************/
+
+h1 { font-family: Trebuchet MS, Arial, Helvetica, sans-serif; color: #ffffff; font-size: 23px; margin-bottom: 15px; text-align: left; }
+body.admin h1 { font-family: Arial, Helvetice, sans-serif; font-size: 25px; font-weight: bold; color: #061D90; margin-top: 10px; margin-bottom: 15px; text-align: left; }
+h2 { font-family: Arial, Helvetica, sans-serif; color: #061d90; font-size: 18px; margin-bottom: 5px; }
+h2 a { color: #061d90; }
+h2 a:hover { color: #078A22; }
+p { line-height: 1.2; margin: 5px 0 10px; }
+#content .hlavni-text { padding: 20px; padding-top: 40px; padding-bottom: 40px; }
+#content-cele .hlavni-text { padding: 20px; padding-top: 20px; background-color: #ffffff; padding-bottom: 50px; }
+#content ul { margin: 10px 0 10px 25px; }
+
+#modal { border: 1px solid #b2b6b9; background-color: #ffffff; width: 80%; padding: 15px;  font-size: 12px; color: #000000; z-index: 11000; }
+	@media screen and (min-width: 800px) { #modal { border: 1px solid #b2b6b9; background-color: #ffffff; width: 700px; padding: 15px;  font-size: 14px; color: #000000; z-index: 11000; } }
+
+
+
+
+
+
+/******************************
+
+	homepage
+
+******************************/
+
+#hp-content { float: right; width: 990px; height: 190px; background-image: url("../img/hp-motiv-dole-bg.gif"); background-repeat: no-repeat; }
+#hp-box-novinky { float: left; width: 630px; height: 190px; margin-left: 45px; background-color: #ECECEC; }
+#hp-box-novinky-vlevo { float: left; width: 295px; height: 190px; padding-top: 20px; padding-left: 30px; }
+#hp-box-novinky-vpravo { float: left; width: 305px; height: 190px; padding-top: 20px; }
+.hp-box-novinky-text { padding-top: 10px; padding-left: 20px; background-image: url("../img/hp-box-novinky-text-bg.gif"); background-repeat: no-repeat; }
+.hp-box-novinky-text a { color: #444444; text-decoration: none; }
+.hp-box-novinky-text a:hover { text-decoration: underline; }
+.hp-box-novinky-upoutavka { width: 275px; font-size: 120%; }
+
+#hp-box-uvitani { float: left; width: 250px; height: 190px; margin-left: 20px; background-color: #0A7E22; }
+#hp-box-uvitani-obsah { font-size: 12px; color: #FFFFFF; padding: 20px; }
+#hp-box-uvitani-obsah #nadpis { font-size: 16px; font-weight: bold; }
+#hp-box-uvitani-obsah a { color: #FFFFFF; }
+#hp-box-uvitani-obsah a:hover { color: #000000; }
+
+.hp-box-uvitani-bunka { float: left; width: 490px; }
+#hp-box-uvitani-vlevo-obsah { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000000; padding-left: 20px; padding-right: 20px; text-align: justify; }
+#hp-box-uvitani-vpravo-obsah { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000000; padding-left: 20px; padding-right: 20px; text-align: justify; }
+
+.hp-box-obsah h2 { font-family: Arial, Helvetica, sans-serif; color: #ffffff; font-size: 17px; font-weight: bold; padding-left: 50px; padding-top: 20px; }
+.hp-box-obsah h2 a { text-decoration: none; color: #ffffff; }
+.hp-box-obsah h2 a:hover { text-decoration: none; color: #ffffff; }
+#hp-boxy-clear { clear: both; }
+
+.hp-tbl { float: left; width: 335px; height: 280px; margin-bottom: 20px; }
+.hp-tbl-posledni { float: left; width: 310px; height: 280px; }
+.banner { width: 310px; margin: 0px; padding: 0px; }
+.banner-posledni { width: 310px; margin: 0px; padding: 0px; }
+.banner-cara { width: 310px; height: 5px; background-color: #D22F2E; }
+.banner-cara-posledni { width: 310px; height: 5px; background-color: #D22F2E; }
+.banner-foto { width: 310px; height: 150px; margin-top: 5px; }
+.banner-foto-posledni { width: 310px; height: 150px; margin-top: 5px; }
+.banner-text { width: 310px; height: 120px; padding: 0px; font-family: Arial, Helvetica, sans-serif; color: #414141; font-size: 12px; }
+.banner-text-obsah { padding: 20px; }
+.banner-text-posledni { width: 310px; height: 120px; padding: 0px; font-family: Arial, Helvetica, sans-serif; color: #414141; font-size: 12px; }
+.banner-nadpis { font-family: Arial, Helvetica, sans-serif; color: #D22F2E; font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+.banner-nadpis a { text-decoration: none; }
+
+
+
+/******************************
+
+	forms
+
+******************************/
+form fieldset { border: none; }
+input, textarea, select { border: 1px solid #c2bab2;}
+input, select, textarea { font: 12px Arial, Helvetica, sans-serif; }
+.submit { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #FFFFFF; font-weight: bold; padding: 4px; padding-left: 8px; padding-right: 8px; border: 0px; background-image: url("../img/tlacitko-submit-bg.gif"); background-color: #63676A; }
+.input { background-color: #F6F6F6; }
+
+
+/******************************
+
+	footer
+
+******************************/
+#footer-partneri { width: 940px; margin: auto; margin-top: 20px; margin-bottom: 20px; }
+#footer-partneri-obsah { background-color: #ececec; text-align: center; padding-top: 10px; padding-bottom: 10px; }
+#footer { width: 940px; margin: auto; margin-top: 0px; }
+#footer #tbl { float: left; width: 940px; height: 180px; background-color: #ECECEC; background-image: url("../img/footer-tbl-bg.gif"); background-repeat: no-repeat; background-position: top right; margin-bottom: 20px; }
+#footer #tbl p { font-size: 12px; }
+#footer .tbl-nadpis { font-size: 14px; font-weight: bold; padding-bottom: 5px; }
+#footer #tbl #tbl-box-prvni { float: left; width: 200px; height: 180px; font: 11px Arial, Helvetica, sans-serif; color: #666565; }
+#footer #tbl #tbl-box-prvni-obsah { padding-left: 50px; padding-top: 30px; }
+#footer #tbl .tbl-box { float: left; width: 200px; height: 180px; font: 11px Arial, Helvetica, sans-serif; color: #666565; background-image: url("../img/footer-tbl-box-bg.gif"); background-repeat: no-repeat; }
+#footer #tbl .tbl-box-obsah { padding-left: 50px; padding-top: 30px; }
+#footer #tbl #tbl-box-posledni { float: left; width: 340px; height: 180px; font: 11px Arial, Helvetica, sans-serif; color: #666565; text-align: right; }
+#footer #tbl #tbl-box-posledni-obsah { padding-right: 50px; padding-top: 30px; }
+#footer-clear { clear: both; }
+#footer-doplnek { margin-bottom: 5px; }
+a.footer-odkaz { color: #666565; }
+a.footer-odkaz:hover { color: #002D5F; text-decoration: underline; }
+
+
+
+
+
+
+
+
+/******************************
+
+	ostatni
+
+******************************/
+
+
+.tbl-vypis { width: 100%; padding: 0px; margin: 0px; border-collapse: collapse; }
+.tbl-vypis td { padding: 6px; margin: 0px; text-align: left; border: 1px solid #ffffff; }
+.tbl-vypis td.stred { text-align: center; }
+
+.tbl-formular { padding: 0px; margin: 0px; border-collapse: collapse; }
+.tbl-formular td { padding: 5px; margin: 0px; text-align: left; }
+.tbl-formular td.vpravo { text-align: right; }
+.pismo2 { font-size: 80%; }
+#logo-stred { text-align: center; font-weight: bold; color: #0075bd; }
+#logo-stred img { margin-top: 5px; }
+.fotky { text-align: center; }
+.fotky img { border: 1px solid #D5D5D5; margin: 3px; padding: 8px; }
+ul.seznam li { margin: 6px; margin-left: 25px; list-style-type: square; }
+.pismo-male { font-size: 10px; }
+
+.tbl-kontakt-stred { padding-left: 50px; padding-top: 10px; }
+.tbl-kontakt-nadpis { border-bottom: 1px solid #b9b9b9; }
+.tbl-kontakt-nadpis h3 { font-size: 20px; color: #061d90; padding-left: 5px; padding-bottom: 10px; }
+.tbl-kontakt-vlevo { padding-top: 12px; }
+.tbl-kontakt-vpravo { padding-top: 14px; }
+.tbl-kontakt { padding: 0px; margin: 0px; width: 300px; border-collapse: collapse; }
+.tbl-kontakt td { padding: 5px; margin: 0px; text-align: left; }
+.tbl-kontakt td.pismo-velke { font-size: 120%; }
+.tbl-kontakt td.sirka180 { width: 180px; }
+.tbl-kontakt td.sirka300 { width: 300px; }
+.tbl-kontakt2 { padding: 0px; margin: 0px; width: 250px; border-collapse: collapse; }
+.tbl-kontakt2 td { padding: 3px; margin: 0px; text-align: left; }
+
+.stranka { font-family: Arial, Helvetica, sans-serif; font-size: 140%; font-weight: bold; color: #ffffff; background-color: #EFB7B5; padding: 6px; text-decoration: none; line-height: 40px; }
+.stranka-aktivni { font-family: Arial, Helvetica, sans-serif; font-size: 140%; font-weight: bold; color: #ffffff; background-color: #C02F2A; padding: 6px; text-decoration: none; line-height: 40px; }
+
+.text-mezera { width: 100%; border-top: 1px dotted #000000; padding-bottom: 15px; }
+
+#tiskstr { width: 700; margin-top: 20px; }
+#tiskstr-vlevo { float: left; width: 350px; font: 11px Arial, Helvetica, sans-serif; color: #666565; background: none 0 0 no-repeat; }
+#tiskstr-vpravo { float: right; width: 350px; font: 11px Arial, Helvetica, sans-serif; color: #666565; text-align: right; }
+#tiskstr-odkaz { background-image: url("../img/ikona-tisk.gif"); background-repeat: no-repeat; padding-left: 20px; margin: 0px; }
+
+.tbl-kontakt-stred { padding-left: 60px; }
+.tbl-kontakt { padding: 0px; margin: 0px; border-collapse: collapse; }
+.tbl-kontakt td { padding: 5px; margin: 0px; text-align: left; }
+.tbl-kontakt td.stred { text-align: center; }
+.tbl-kontakt-od { padding: 0px; margin: 0px; border-collapse: collapse; background-color: #dfe8f5; }
+.tbl-kontakt-od td { padding: 5px; margin: 0px; text-align: left; }
+
+.mono { font-family: monospace; }
+.level-1 { margin: 0 0 10px 50px; text-indent: -42px; text-align: left; }
+.level-2 { margin: 0 0 10px 110px; text-indent: -57px; text-align: left; }
+.level-3 { margin: 0 0 10px 166px; text-indent: -57px; text-align: left; }
+
+.tbl-bunka-nadpis { background-color: #757575; }
+.tbl-bunka-svetla { background-color: #EDEDED; }
+.tbl-bunka-tmava { background-color: #E0DFDF; }
+
+.tbl-bunka-stav0 { background-color: #f5cece; }
+.tbl-bunka-stav1 { background-color: #f5f5ce; }
+.tbl-bunka-stav2 { background-color: #d1f5ce; }
+
+#mapa-serveru li { margin: 6px; margin-left: 25px; list-style-type: square; }
+#mapa-serveru ul li { margin: 6px; margin-left: 25px; list-style-type: square; }
+#mapa-serveru li.hlavni { margin-top: 25px; }
+
+.dotaz-tbl-vypis { padding: 0px; margin: 0px; width: 600px; border-collapse: collapse; }
+.dotaz-tbl-vypis td { font-size: 12px; padding: 6px; margin: 0px; border-bottom: 1px solid #d5d5d5; text-align: left; }
+
+.soubor-pdf { background-image: none; background-repeat: no-repeat; background-color: #eeefef; padding: 8px; padding-left: 30px; margin: 0px auto; width: 250px; }
+
+
+
+
+
+
+
+
+
+
+/* FOTOGALERIE */
+
+#lightbox{	position: absolute;	left: 0; width: 100%; z-index: 100; text-align: center; line-height: 0;}
+#lightbox img{ width: auto; height: auto;}
+#lightbox a img{ border: none; }
+#outerImageContainer{ position: relative; background-color: #fff; width: 250px; height: 250px; margin: 0 auto; }
+#imageContainer{ padding: 10px; }
+#loading{ position: absolute; top: 40%; left: 0%; height: 25%; width: 100%; text-align: center; line-height: 0; }
+#hoverNav{ position: absolute; top: 0; left: 0; height: 100%; width: 100%; z-index: 10; }
+#imageContainer>#hoverNav{ left: 0;}
+#hoverNav a{ outline: none;}
+#prevLink, #nextLink{ width: 49%; height: 100%; background-image: url(data:image/gif;base64,AAAA); /* Trick IE into showing hover */ display: block; }
+#prevLink { left: 0; float: left;}
+#nextLink { right: 0; float: right;}
+#prevLink:hover, #prevLink:visited:hover { background: none left 15% no-repeat; }
+#nextLink:hover, #nextLink:visited:hover { background: none right 15% no-repeat; }
+#imageDataContainer{ font: 10px Verdana, Helvetica, sans-serif; background-color: #fff; margin: 0 auto; line-height: 1.4em; overflow: auto; width: 100%	; }
+#imageData{	padding:0 10px; color: #666; }
+#imageData #imageDetails{ width: 70%; float: left; text-align: left; }	
+#imageData #caption{ font-weight: bold;	}
+#imageData #numberDisplay{ display: block; clear: left; padding-bottom: 1.0em;	}			
+#imageData #bottomNavClose{ width: 66px; float: right;  padding-bottom: 0.7em; outline: none;}	 	
+#overlay{ position: absolute; top: 0; left: 0; z-index: 90; width: 100%; height: 500px; background-color: #000; }

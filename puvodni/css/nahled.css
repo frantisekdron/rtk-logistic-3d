@@ -1,0 +1,35 @@
+body { background: #fff; }
+.archive-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  box-sizing: border-box; min-height: 44px; padding: 7px max(12px, calc((100vw - 990px) / 2));
+  background: #172022; color: #e8edea; font: 14px/1.35 Arial, sans-serif;
+}
+.archive-bar span { font-weight: bold; }
+.archive-bar div { display: flex; align-items: center; gap: 7px; }
+.archive-bar a, .archive-bar button {
+  white-space: nowrap; padding: 5px 10px; color: #e9eeea; background: transparent;
+  border: 1px solid #61706d; border-radius: 3px; text-decoration: none;
+  font: inherit; font-size: 13px; cursor: pointer;
+}
+.archive-bar a { border-color: #cde87b; color: #d9f28b; }
+.archive-bar a:hover, .archive-bar button:hover { background: #2d3839; }
+.archive-bar :focus-visible, .archive-dialog button:focus-visible { outline: 2px solid #cde87b; outline-offset: 2px; }
+.archive-window { width: 100%; overflow-x: auto; }
+.historic-page { min-width: 990px; background: #fff url(../img/pozadi.jpg) no-repeat top center; }
+.view-zoom { display: none; }
+.archive-dialog { width: min(700px, 85vw); box-sizing: border-box; border: 1px solid #b2b6b9; padding: 15px; background: white; color: #000; font: 14px Arial, sans-serif; }
+.archive-dialog h3, .archive-dialog p { text-align: center; }
+.archive-dialog h3 { margin: 5px 0 12px; font-size: 17px; }
+.archive-dialog form { text-align: right; }
+.archive-dialog button { color: #078a22; border: 0; background: transparent; font-weight: bold; text-decoration: underline; cursor: pointer; }
+.archive-dialog::backdrop { background: rgba(0,0,0,.4); }
+.archive-note { margin: 0 0 15px; line-height: 1.4; }
+fieldset[disabled] { border: 0; }
+@media (max-width: 989px) {
+  .historic-page { width: 990px; }
+  .view-zoom { display: inline-block; }
+  .archive-bar { flex-wrap: wrap; gap: 5px 8px; }
+}
+@media print {
+  .archive-bar, .archive-dialog { display: none; }
+}
