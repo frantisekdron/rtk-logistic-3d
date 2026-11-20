@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {cycle, truckPoseAt} from './route.js';
+import {cycle, smooth, truckPoseAt, vanPoseAt} from './route.js?v=yard-motion1';
 
 const palette = {
   plinth: ['#263137',.45,.48], bevel: ['#44545a',.52,.37], road: ['#4c565a',.02,.91],
@@ -18,7 +18,6 @@ export function buildWarehouse() {
   const root = new T.Group();
   const moving = new T.Group();
   const roof = new T.Group(); root.add(roof);
-  const actors=[];
   const blue=new T.MeshStandardMaterial({color:'#355a97',metalness:.35,roughness:.55});
   const pools = new Map();
   const unit = new T.BoxGeometry(1,1,1);
@@ -120,10 +119,10 @@ export function buildWarehouse() {
 
   // Stylised reconstruction from RTK's published photographs: twin gables,
   // continuous high windows, blue seams, low side wings and a loading court.
-  b('plinth',0,-.5,1,30.6,.65,24.6);
-  b('bevel',0,-.16,1,30.7,.1,24.7);
-  b('asphalt',0,-.07,1,30.6,.12,24.6);
-  b('road',0,.005,9.5,30,.025,5.8);
+  b('plinth',0,-.5,1,33.8,.65,27.4);
+  b('bevel',0,-.16,1,33.9,.1,27.5);
+  b('asphalt',0,-.07,1,33.8,.12,27.4);
+  b('road',0,.005,9.3,32.4,.025,7.9);
   b('concrete',0,.02,-3,28,.04,12.4);
   for(let x=-14;x<15;x+=2) b('stripe',x,.025,10.5,1,.022,.08);
   for(const z of [7.4,12.2]) b('stripe',0,.027,z,29,.02,.06);
@@ -210,17 +209,31 @@ export function buildWarehouse() {
   const truck=group(()=>vehicle(0,0,0,'yellow',true));
   const passing=group(()=>vehicle(0,0,0,'white',true));passing.scale.setScalar(.86);
   // Animated articulated workers, with helmets and high-visibility vests.
-  function worker(x,z){
-    const g=group(()=>{b('yellow',0,.95,0,.28,.38,.19);b('white',0,.95,.105,.28,.05,.025);b('skin',0,1.24,0,.18,.20,.19);b('yellow',0,1.37,0,.23,.10,.23);});
-    g.position.set(x,.08,z);
+  function worker(x,z,job) {
+    const g=group(()=>{
+      b('yellow',0,.9,0,.34,.48,.25);b('white',0,.94,.13,.35,.06,.025);
+      b('skin',0,1.26,0,.20,.24,.22);b('yellow',0,1.42,0,.25,.09,.26);
+      if(job==='parcel') crate(0,.77,.27,.47,.35,.36,1);
+      if(job==='jack'){
+        b('yellow',0,.22,-.94,.74,.14,.93);
+        for(const dx of [-.26,.26]) b('tire',dx,.10,-1.16,.12,.18,.18);
+        b('wood',0,.34,-1.03,.85,.12,.91);crate(0,.40,-1.03,.78,.55,.82,2);
+        rod('charcoal',[.15,.28,-.59],[.21,.79,-.24],.055);
+        b('charcoal',.21,.8,-.24,.24,.055,.06);
+      }
+    });
     const limbs=[];
-    for(const [dx,y,len,mat] of [[-.09,.76,.45,'charcoal'],[.09,.76,.45,'charcoal'],[-.21,1.1,.34,'yellow'],[.21,1.1,.34,'yellow']]){
+    for(const [dx,y,len,mat] of [[-.10,.69,.62,'charcoal'],[.10,.69,.62,'charcoal'],[-.23,1.09,.41,'yellow'],[.23,1.09,.41,'yellow']]){
       const pivot=new T.Group();pivot.position.set(dx,y,0);g.add(pivot);
-      const mesh=new T.Mesh(unit,material[mat]);mesh.scale.set(.10,len,.12);mesh.position.y=-len/2;mesh.castShadow=true;pivot.add(mesh);limbs.push(pivot);
+      const mesh=new T.Mesh(unit,material[mat]);mesh.scale.set(.12,len,.14);mesh.position.y=-len/2;mesh.castShadow=true;pivot.add(mesh);
+      if(limbs.length<2){
+        const shoe=new T.Mesh(unit,material.tire);shoe.scale.set(.14,.10,.22);shoe.position.set(0,-len,.04);pivot.add(shoe);
+      }
+      limbs.push(pivot);
     }
-    return {g,limbs,x,z};
+    return {g,limbs,x,z,job};
   }
-  const workers=[worker(-8,2.6),worker(5.6,2.6),worker(13.4,-2)];
+  const workers=[worker(-7.3,2.75,'jack'),worker(5,2.65,'parcel'),worker(13.7,-1.5,'walk')];
   // Forklift with a separately animated carriage and removable pallet.
   const fork=group(()=>{
     b('yellow',0,.4,0,.78,.45,1.10);b('charcoal',0,.68,-.26,.7,.16,.5);
@@ -236,28 +249,32 @@ export function buildWarehouse() {
   const gate=group(()=>{b('white',1.3,0,0,2.6,.07,.1);for(let x=.1;x<2.6;x+=.35)b('red',x,0,.06,.16,.08,.025);});gate.position.set(-13.4,1,7.3);
   b('blue',-13.4,.5,7.3,.25,1,.25);
   root.remove(delivered);truck.add(delivered);
-  const lerp=(a,b,p)=>a+(b-a)*Math.max(0,Math.min(1,p));
-  const ease=p=>{p=Math.max(0,Math.min(1,p));return p*p*(3-2*p);};
-  function update(time){
+  function update(time, yardTime=time) {
     const t=((time%cycle)+cycle)%cycle;
-    const pose=truckPoseAt(t);
-    truck.position.set(pose.x,0,pose.z);truck.rotation.y=pose.heading;
-    // A second truck uses the separate outer lane, with no crossing of the loading path.
-    const p=(time%32)/32;passing.position.set(lerp(-12,12,p<.5?p*2:2-p*2),0,12.5);passing.rotation.y=p<.5?Math.PI/2:-Math.PI/2;
-    const loading=t>=15&&t<29;
-    const u=Math.max(0,Math.min(14,t-15));
-    const fz=u<5?lerp(-3.2,2.2,ease(u/5)):u<8?2.2:lerp(2.2,-3.2,ease((u-8)/6));
-    fork.position.set(10.5,.82,loading?fz:-3.2);
-    lift.position.y=loading?lerp(.12,.20,ease(u/4)):.12;
-    cargo.visible=t<22;delivered.visible=t>=22&&t<35;
-    delivered.position.set(0,1.0,-1.2);
-    gate.rotation.z=t<8?-.95:0;
-    workers.forEach((w,i)=>{
-      const phase=time*.45+i*2, span=i===0?2.4:i===1?1.4:2.0;
-      const offset=Math.sin(phase)*span;const forward=Math.cos(phase)>0;
-      w.g.position.set(i<2?w.x+offset:w.x,.08,i<2?w.z:w.z+offset);
-      w.g.rotation.y=i<2?(forward?Math.PI/2:-Math.PI/2):(forward?0:Math.PI);
-      w.limbs.forEach((limb,k)=>limb.rotation.x=Math.sin(time*7+i)*.42*(k%2?-1:1));
+    const pose=truckPoseAt(t), van=vanPoseAt(yardTime);
+    truck.position.set(pose.x,0,pose.z); truck.rotation.y=pose.heading;
+    passing.position.set(van.x,0,van.z); passing.rotation.y=van.heading;
+    const approach=smooth((t-15)/6), retreat=smooth((t-23)/5.5);
+    fork.position.set(10.5,.82,-3.2+5.5*(approach-retreat));
+    // Both copies of the pallet occupy the same world position at transfer.
+    const raised=smooth((t-15)/3)-smooth((t-21)/1.4);
+    lift.position.y=.11+.32*raised;
+    cargo.visible=t<22.4;
+    delivered.visible=t>=22.4;
+    delivered.position.set(0,.93,-1.17);
+    gate.rotation.z=1.25*(1-smooth((t-4)/2)+smooth((t-37)/2));
+    workers.forEach((worker,i)=>{
+      const angle=yardTime*(i===0?.31:.39)+i*2;
+      const width=i===0?2.65:1.6, radius=i===2?.35:.39;
+      const along=Math.sin(angle)*width, across=Math.cos(angle)*radius;
+      const vx=Math.cos(angle)*width, vz=-Math.sin(angle)*radius;
+      const step=yardTime*(i===0?4.7:5.3)+i*1.6;
+      worker.g.position.set(worker.x+(i===2?across:along),.08+.023*Math.sin(step)**2,worker.z+(i===2?along:across));
+      worker.g.rotation.y=Math.atan2(i===2?vz:vx,i===2?vx:vz);
+      const swing=Math.sin(step)*.36;
+      worker.limbs[0].rotation.x=swing;worker.limbs[1].rotation.x=-swing;
+      worker.limbs[2].rotation.x=worker.job==='parcel'?-.84:-swing;
+      worker.limbs[3].rotation.x=worker.job==='parcel'?-.84:worker.job==='jack'?.59:swing;
     });
     return t<15?'arrival':t<29?'loading':'dispatch';
   }
@@ -270,5 +287,5 @@ export function buildWarehouse() {
     mesh.receiveShadow=true;
     target.add(mesh);
   }
-  return {root,moving,update,setCutaway,truck,fork,workers,roof};
+  return {root,moving,update,setCutaway,truck,passing,fork,lift,cargo,delivered,gate,workers,roof};
 }

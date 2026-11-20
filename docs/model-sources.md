@@ -12,6 +12,6 @@ BAUHAUS, OBI, Baumax, Hornbach, Globus a Tesco jsou výslovně uvedeny v původn
 
 ## Provoz a úpravy
 
-GitHub Pages publikuje kořen větve `main`. Model automaticky přehrává příjezd, nakládku a odjezd. Kliknutí na žlutý kamion nebo jeho bublinu přiblíží rampu a zahájí nakládku. Po druhém kliknutí kamion odjede. Stejný postup funguje klávesnicí a bez WebGL. Záložní animace používá 168 předrenderovaných snímků téhož modelu. Při zapnutém omezení pohybu se scéna sama nehýbe a mezi fázemi přechází ihned.
+GitHub Pages publikuje kořen větve `main`. Model automaticky přehrává příjezd, nakládku a odjezd. Kliknutí na žlutý kamion nebo jeho bublinu přiblíží rampu a zahájí nakládku. Po druhém kliknutí kamion odjede. Stejný postup funguje klávesnicí a bez WebGL. Pohyb vozidel i pracovníků se počítá v každém snímku. Záložní vykreslování bez WebGL používá nasvícené pozadí skladu a dopočítává pohybující se části stejného 3D modelu. Při zapnutém omezení pohybu se scéna sama nehýbe a mezi fázemi přechází ihned.
 
 Kontrola logiky: `node tests/operations.mjs`. Ručně spustitelný GitHub workflow kontroluje publikovaný web v desktopovém, mobilním a záložním režimu.

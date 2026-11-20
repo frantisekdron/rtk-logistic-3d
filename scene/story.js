@@ -1,59 +1,38 @@
-import {cycle} from './route.js';
+import {cycle} from './route.js?v=yard-motion1';
 
-// All three phases play the same route as the unattended scene.
+// The truck keeps its place on the route when a visitor takes over.
 export function createStory(onChange) {
-  let stage = 'idle', time = 15, age = 0;
-  function enter(next) {
-    stage = next;
-    age = 0;
-    onChange(next);
-  }
+  let stage = 'idle', time = 15, age = 0, speed = 1.1;
+  function enter(next) {stage=next; age=0; onChange(next);}
   function load(reduced) {
-    if (stage === 'ready') {
-      time = reduced ? cycle - 0.01 : 29;
-      enter(reduced ? 'sent' : 'driving');
+    if (stage==='ready') {
+      if (reduced) time=cycle-.01;
+      enter(reduced?'sent':'driving');
+    } else if (stage==='idle') {
+      if (reduced) {time=29; enter('ready');}
+      else enter(time>=15 && time<29?'loading':'docking');
+    }
+  }
+  function update(dt, reduced) {
+    if (reduced) {
+      if (stage==='loading' || stage==='docking') {time=29; enter('ready');}
+      if (stage==='driving') {time=cycle-.01; enter('sent');}
+      if (stage==='sent' && (age+=dt)>=2.1) {time=15; enter('idle');}
       return;
     }
-    if (stage !== 'idle') return;
-    if (reduced) {
-      time = 28.95;
-      enter('ready');
-    } else if (time < 15 || time >= 29) {
-      enter('docking');
-    } else {
-      // Keep a pallet already on its way to the trailer moving smoothly.
-      if (time >= 22) time = 15;
-      enter('loading');
+    if (stage==='ready') return;
+    const desired = stage==='idle' || stage==='sent' ? 1.1 : 1.8;
+    speed += (desired-speed)*(-Math.expm1(-dt*1.8));
+    const next = time+speed*dt;
+    if (stage==='loading' && next>=29) {
+      time=29; enter('ready'); return;
     }
+    const crossesDock = time<15 && next>=15;
+    const crossesGate = next>=cycle;
+    time = next%cycle;
+    if (stage==='docking' && crossesDock) enter('loading');
+    else if (stage==='driving' && crossesGate) enter('sent');
+    else if (stage==='sent' && (age+=dt)>=2.1) enter('idle');
   }
-  function update(dt, reduced, reading) {
-    switch (stage) {
-      case 'idle':
-        if (!reduced && !reading) time = (time + dt * 1.35) % cycle;
-        break;
-      case 'docking': {
-        const remaining = (15 - time + cycle) % cycle;
-        if (reduced || remaining <= dt * 9) {
-          time = 15;
-          enter('loading');
-        } else time = (time + dt * 9) % cycle;
-        break;
-      }
-      case 'loading':
-        time = reduced ? 28.95 : Math.min(28.95, time + dt * 4.4);
-        if (time >= 28.95) enter('ready');
-        break;
-      case 'driving':
-        time = reduced ? 41.99 : Math.min(41.99, time + dt * 3.5);
-        if (time >= 41.99) enter('sent');
-        break;
-      case 'sent':
-        age += dt;
-        if (age >= 2.1) {
-          time = reduced ? 15 : 0;
-          enter('idle');
-        }
-    }
-  }
-  return {load, update, get time() {return time;}, get stage() {return stage;}};
+  return {load,update,get time(){return time;},get stage(){return stage;}};
 }

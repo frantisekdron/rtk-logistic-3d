@@ -221,3 +221,6 @@ footer{background:#101719;border-top:0}.footer-inner{min-height:7rem}
 @media(max-width:780px){.hero-inner{grid-template-columns:1fr;gap:0}.model{width:min(100%,42rem);margin:0 auto 1.1rem}.intro{padding-bottom:.55rem}}
 @media(max-width:580px){.model{width:calc(100% + var(--gutter) * 2);margin:0 calc(-1 * var(--gutter)) 1.15rem}.truck-bubble{font-size:.8125rem;min-height:36px}}
 #warehouse{overflow:clip}
+
+.yard-poster{opacity:1;transition:opacity .45s ease-out}
+.yard-poster.painted{opacity:0}

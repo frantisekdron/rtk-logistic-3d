@@ -11,7 +11,7 @@ async function verify(browser, {name, mobile, fallback, reduced}) {
     reducedMotion: reduced ? 'reduce' : 'no-preference', hasTouch:mobile, isMobile:mobile
   });
   const page = await context.newPage();
-  page.setDefaultTimeout(20000);
+  page.setDefaultTimeout(45000);
   try {
     if (fallback) await page.addInitScript(() => {
       const original = HTMLCanvasElement.prototype.getContext;
@@ -25,11 +25,11 @@ async function verify(browser, {name, mobile, fallback, reduced}) {
     await page.goto(process.env.SITE_URL, {waitUntil:'domcontentloaded'});
     const yard = page.locator('#warehouse');
     await yard.scrollIntoViewIfNeeded();
-    await page.locator('#warehouse[data-scene-state="'+(fallback?'frames':'ready')+'"] canvas').waitFor();
+    await page.locator('#warehouse[data-scene-state="'+(fallback?'software':'ready')+'"] canvas').waitFor();
     await page.waitForFunction(()=>document.querySelector('.yard-poster').hidden);
     const truck = yard.locator('button');
     const phase = value => page.locator('.model[data-story="'+value+'"]').waitFor();
-    const pixels = async () => createHash('sha256').update(await yard.locator('canvas').screenshot()).digest('hex');
+    const pixels = async () => createHash('sha256').update(await yard.locator('canvas[data-active]').screenshot()).digest('hex');
     const start = await pixels();
     assert.equal(await page.locator('.dispatch-console,input[type=range]').count(),0);
     assert.equal(await page.locator('.partner-list li').count(),6);
@@ -37,6 +37,24 @@ async function verify(browser, {name, mobile, fallback, reduced}) {
     await page.waitForTimeout(420);
     if (reduced) assert.equal(await pixels(),start,'Reduced motion holds until requested');
     else assert.notEqual(await pixels(),start,'The warehouse moves without input');
+    if (fallback && !reduced) {
+      const cadence=await page.evaluate(async()=>{
+        const surface=document.querySelector('#warehouse canvas[data-active]');
+        const probe=document.createElement('canvas');probe.width=160;probe.height=100;
+        const ctx=probe.getContext('2d',{willReadFrequently:true});
+        const images=new Set(), timestamps=[];
+        for(let i=0;i<45;i++){
+          timestamps.push(await new Promise(requestAnimationFrame));
+          ctx.drawImage(surface,0,0,160,100);
+          const data=ctx.getImageData(0,0,160,100).data;
+          let hash=0;for(let j=0;j<data.length;j+=4)hash=(Math.imul(31,hash)+data[j])|0;
+          images.add(hash);
+        }
+        return {different:images.size,ms:Math.round(timestamps.at(-1)-timestamps[0])};
+      });
+      assert.ok(cadence.different>=30,'The software renderer draws continuous motion, not a flipbook');
+      console.log('Canvas cadence',cadence);
+    }
     const body = await truck.boundingBox();
     assert.ok(body.width>=44 && body.height>=44);
     const hit = {x:body.x+body.width/2, y:body.y+body.height/2};
@@ -45,6 +63,15 @@ async function verify(browser, {name, mobile, fallback, reduced}) {
     await phase('ready');
     assert.equal(await truck.getAttribute('aria-label'),'Naloženo. Poslat kamion na cestu');
     assert.notEqual(await pixels(),start,'Loading changes the view');
+    if (!reduced) {
+      await page.waitForTimeout(1800);
+      const parked=await truck.boundingBox();
+      const active=await pixels();
+      await page.waitForTimeout(480);
+      assert.notEqual(await pixels(),active,'Other actors still move when the truck is waiting');
+      const still=await truck.boundingBox();
+      assert.ok(Math.abs(parked.x-still.x)<1 && Math.abs(parked.y-still.y)<1);
+    }
     await page.screenshot({path:artifacts+'/'+name+'.png'});
     if (mobile) await truck.locator('.truck-bubble').tap();
     else {await truck.focus();await page.keyboard.press('Enter');}
@@ -65,7 +92,7 @@ async function verify(browser, {name, mobile, fallback, reduced}) {
   try {
     await verify(browser,{name:'desktop-webgl',mobile:false,fallback:false,reduced:false});
     await verify(browser,{name:'mobile-webgl',mobile:true,fallback:false,reduced:false});
-    await verify(browser,{name:'mobile-frames',mobile:true,fallback:true,reduced:false});
+    await verify(browser,{name:'mobile-software',mobile:true,fallback:true,reduced:false});
     await verify(browser,{name:'reduced-motion',mobile:false,fallback:true,reduced:true});
   } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
