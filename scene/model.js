@@ -16,6 +16,9 @@ const palette = {
 export function buildWarehouse() {
   const root = new T.Group();
   const moving = new T.Group();
+  const roof = new T.Group(); root.add(roof);
+  const actors=[];
+  const blue=new T.MeshStandardMaterial({color:'#355a97',metalness:.35,roughness:.55});
   const pools = new Map();
   const unit = new T.BoxGeometry(1,1,1);
   const round = new T.CylinderGeometry(.5,.5,1,20);
@@ -24,6 +27,7 @@ export function buildWarehouse() {
     m.name=name;
     return [name,m];
   }));
+  material.blue=blue; material.skin=new T.MeshStandardMaterial({color:'#c7a180',roughness:.85}); material.green=new T.MeshStandardMaterial({color:'#56644d',roughness:.95});
   const ox = new T.Matrix4();
   let parent = root;
   function part(shape,name,x,y,z,w,h,d,rx=0,ry=0,rz=0) {
@@ -52,105 +56,6 @@ export function buildWarehouse() {
     const rot=new T.Euler().setFromQuaternion(q);
     b(name,mid.x,mid.y,mid.z,size,delta.length(),size,rot.x,rot.y,rot.z);
   }
-  // Stepped foundation, road markings and painted edges of the loading apron.
-  b('plinth',0,-.54,0,26.8,.64,18.2);
-  b('bevel',0,-.22,0,26.86,.12,18.26);
-  b('asphalt',0,-.09,0,26.78,.16,18.16);
-  b('road',0,.004,2.5,26.15,.024,6.9);
-  b('concrete',-.35,.012,-3.73,24,.07,9.25);
-  for(const x of [-10.25,-8,-5.75,-3.5,-1.25,1,3.25,5.5,7.75,10,12.25]) b('stripe',x,.014,7.76,1.05,.018,.08);
-  for(let x=-12.5;x<13;x+=2.6) b('trim',x,.038,3.53,.022,.03,4.68);
-  for(const x of [-9.8,-6.9,-3.9,-.85,2.2,5.14]) {
-    b('yellow',x,.044,2.95,.052,.025,3.51);
-    b('yellow',x+.37,.045,4.70,.79,.025,.052);
-  }
-  for(let k=0;k<8;k++) b('white',8.08+k*.31,.038,2.91,.12,.02,1.17);
-  for(const z of [6.77,8.54]) b('stripe',-.25,.027,z,23.8,.018,.043);
-  // Foundations with individual bumper stones and continuous curb.
-  b('lightConcrete',-.8,.34,-3.47,21.22,.62,9.31);
-  b('charcoal',-.8,.67,-3.47,21.12,.09,9.23);
-  b('concrete',-.8,.74,-3.47,21.02,.07,9.12);
-  // Main envelope with folded metal sheets on exterior faces.
-  b('sheet',-.8,3.03,-8,21,.1+4.48,.17);
-  b('sheet',-11.2,3.03,-3.46,.16,4.55,9.06);
-  for(let x=-11.12;x<9.7;x+=.28) b('rib',x,3.04,-8.12,.034,4.5,.07);
-  for(let z=-7.85;z<1;z+=.28) b('rib',-11.31,3.02,z,.07,4.46,.038);
-  b('charcoal',-.8,5.42,-8.01,21.2,.24,.34);
-  b('charcoal',-11.18,5.42,-3.52,.32,.24,9.14);
-  // Front dispatch wall. Open bay doors alternate with metal-clad wall sections.
-  const dockCenters=[-7.86,-4.83,-1.80,1.23];
-  b('sheet',-4.35,3.91,1.04,13.66,1.12,.24);
-  for(let x=-11.07;x<2.51;x+=.24) b('rib',x,3.91,1.19,.026,1.11,.038);
-  b('charcoal',-4.35,4.56,1.04,13.84,.19,.35);
-  b('yellow',-4.35,4.44,1.24,13.80,.07,.06);
-  b('sheet',-10.38,2.16,1.04,1.63,2.71,.25);
-  for(const x of [-6.34,-3.31,-.28]) b('sheet',x,2.17,1.04,.80,2.80,.25);
-  b('sheet',2.40,2.15,1.04,.43,2.8,.25);
-  dockCenters.forEach((x,index)=>{
-    b('black',x,1.98,1.09,2.16,2.58,.16);
-    b('trim',x,2.02,1.20,1.84,2.33,.10);
-    for(let y=.97;y<3.19;y+=.21) b('sheet',x,y,1.27,1.79,.17,.06);
-    for(const dx of [-.49,0,.49]) b('glass',x+dx,2.26,1.315,.33,.13,.04);
-    b('black',x,3.22,1.34,2.25,.20,.40);
-    for(const dx of [-1,1]) {
-      b('black',x+dx,2.01,1.35,.18,2.35,.34);
-      b('black',x+dx*.79,.66,1.45,.26,.33,.32);
-      c('yellow',x+dx*1.13,.38,1.67,.115,.74,.115);
-      c('charcoal',x+dx*1.13,.50,1.67,.119,.12,.119);
-    }
-    b('charcoal',x,.74,1.46,1.52,.12,.50);
-    b('light',x,3.61,1.23,.44,.08,.10);
-    for(let n=0;n<index+1;n++) b('charcoal',x-.25+n*.16,3.93,1.21,.07,.22,.03);
-  });
-  // Structural bays on the open side reveal mezzanine storage and braced frames.
-  for(const x of [-10.98,-7.49,-4,-.51,2.98,6.47,9.42]) {
-    b('trim',x,3.10,-7.77,.13,4.85,.16);
-    b('steel',x,5.46,-3.49,.14,.16,8.8);
-  }
-  for(const x of [3,6.47,9.45]) {
-    b('trim',x,3.08,.91,.15,4.65,.16);
-    b('yellow',x,1.07,.91,.21,.64,.22);
-  }
-  b('charcoal',6.23,5.47,1.01,6.75,.24,.27);
-  b('yellow',6.23,5.43,1.16,6.73,.078,.041);
-  b('trim',9.5,5.47,-3.47,.27,.24,9.1);
-  rod('steel',[9.43,.85,-7.86],[9.43,5.33,-5.70],.085);
-  rod('steel',[9.43,5.32,-7.86],[9.43,.85,-5.70],.085);
-  // A partially open zinc standing-seam roof with upstands, vents, and skylights.
-  b('sheet',-6.64,5.52,-3.47,9.34,.18,9.23);
-  for(let x=-11.20;x<-2.0;x+=.23) b('rib',x,5.63,-3.47,.027,.055,9.17);
-  b('steel',-6.62,5.63,1.12,9.50,.12,.17);
-  b('charcoal',-1.98,5.53,-3.47,.15,.24,9.26);
-  b('sheet',3.81,5.49,-7.30,11.54,.12,1.48);
-  for(let x=-1.85;x<9.6;x+=.24) b('rib',x,5.58,-7.31,.026,.06,1.44);
-  for(const x of [-9.62,-7.91,-6.20]) {
-    b('charcoal',x,5.66,-4.49,1.25,.09,3.20);
-    b('glass',x,5.74,-4.49,1.12,.12,3.03);
-    for(const dz of [-1.50,-.50,.50,1.50]) b('steel',x,5.82,-4.49+dz,1.19,.05,.055);
-    b('clear',x-.26,5.806,-4.49,.025,.035,2.98);
-  }
-  for(const x of [-8.95,-6.85,-4.75]) {
-    b('black',x,5.67,-.34,1.65,.14,1.31);
-    b('steel',x,5.90,-.34,1.52,.40,1.18);
-    c('charcoal',x,6.13,-.34,.76,.055,.76);
-    for(let a=0;a<5;a++) {
-      const r=a*Math.PI/5;
-      b('trim',x,6.167,-.34,.70,.021,.035,0,r);
-    }
-    c('hub',x,6.17,-.34,.17,.04,.17);
-    for(let z=-.82;z<.24;z+=.16) b('trim',x+.77,5.90,z,.03,.24,.045);
-  }
-  // Precast office annex with wraparound glazing and finely divided mullions.
-  b('lightConcrete',-10.21,.51,2.18,3.24,.95,2.18);
-  b('sheet',-10.21,1.79,2.18,3.21,2.12,2.13);
-  b('glass',-10.21,2.05,3.27,2.91,1.22,.05);
-  b('glass',-8.58,2.03,2.21,.045,1.19,1.92);
-  for(let x=-11.59;x<-8.76;x+=.53) b('trim',x,2.04,3.31,.045,1.24,.05);
-  for(let z=1.37;z<3.30;z+=.47) b('trim',-8.55,2.05,z,.04,1.24,.041);
-  b('charcoal',-10.21,2.95,2.18,3.42,.23,2.38);
-  b('steel',-10.21,3.08,2.18,3.40,.09,2.33);
-  b('light',-10.21,2.83,3.37,3.10,.044,.04);
-  // Shelving with narrow aisles and multiple irregular stacks of banded cartons.
   let seed=1432;
   const random=()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296;};
   function crate(x,y,z,w,h,d,id=0) {
@@ -159,25 +64,6 @@ export function buildWarehouse() {
     b('tape',x+w*.15,y+h-.13,z+d/2+.009,.052,.26,.017);
     if(w>.68) b('white',x-w*.23,y+h*.39,z+d/2+.011,.16,.09,.012);
   }
-  for(const z of [-5.86,-3.09,-.37]) {
-    for(const x of [-.96,1.05,3.06,5.07,7.08,9.09]) {
-      for(const dz of [-.55,.55]) b('charcoal',x,2.87,z+dz,.075,4.14,.075);
-      rod('trim',[x,1.10,z-.53],[x,2.32,z+.53],.045);
-      rod('trim',[x,3.44,z-.53],[x,4.7,z+.53],.045);
-    }
-    for(const y of [1.02,2.29,3.57]) {
-      for(const dz of [-.56,.56]) b('orange',4.066,y,z+dz,10.16,.12,.08);
-      b('wood',4.066,y+.04,z,10.13,.07,1.10);
-      for(let i=0;i<5;i++) for(let j=0;j<2;j++) {
-        if(random()<.16) continue;
-        const x=-.96+i*2.01+.50+j*.93;
-        const h=.45+random()*.34;
-        crate(x,y+.11,z,.78+random()*.09,h,.88,Math.floor(random()*3));
-        if(random()>.72) crate(x-.10,y+.12+h,z-.03,.56,.23,.65,2);
-      }
-    }
-  }
-  // Raised RTK letters on a high-contrast dock-side nameplate.
   function mark(x,y,z,scale,rotation=0,body='charcoal',letters='white'){
     local(x,y,z,rotation,()=>{
       b(body,0,0,0,2.99*scale,.91*scale,.075*scale);
@@ -191,7 +77,6 @@ export function buildWarehouse() {
       }));
     });
   }
-  mark(-6.2,4.90,1.16,1.23,0,'charcoal','limeLight');
   function wheel(x,y,z,r) {
     c('tire',x,y,z,r*2,.31,r*2,0,0,Math.PI/2);
     const edge=x+.17*Math.sign(x);
@@ -203,7 +88,10 @@ export function buildWarehouse() {
       const end=short?1.54:2.81;
       b('charcoal',0,.47,-.04,1.28,.30,end*2+.68);
       b('steel',0,.81,-.46,1.51,.14,2*end-.14);
-      b('white',0,1.50,-.46,1.49,1.36,2*end-.18);
+      b('white',-.72,1.50,-.46,.07,1.36,2*end-.18);
+      b('white',.72,1.50,-.46,.07,1.36,2*end-.18);
+      b('white',0,1.50,end-.58,1.49,1.36,.07);
+
       b('rib',0,2.20,-.46,1.53,.10,2*end-.12);
       for(const dx of [-.75,.75]) {
         b('trim',dx,1.48,-.46,.028,.06,2*end-.20);
@@ -228,42 +116,160 @@ export function buildWarehouse() {
       b('white',0,.67,end+1.14,.23,.071,.02);
     });
   }
-  vehicle(-4.83,3.38,0,'yellow',true);
-  vehicle(4.38,6.32,Math.PI/2,'white',false);
-  // Forklift with safety cage, seat, hydraulic mast, forks and a strapped pallet.
-  root.add(moving);
-  moving.position.set(6.30,.08,2.07);
-  parent=moving;
-  local(0,0,0,-Math.PI/2,()=>{
-    b('yellow',0,.51,0,.82,.5,1.29);
-    b('charcoal',0,.78,-.32,.74,.21,.55);
-    b('tire',0,.96,-.18,.44,.15,.42);
-    b('tire',0,1.12,-.36,.44,.32,.08,-.15);
-    for(const dx of [-.35,.35]) for(const dz of [-.45,.38]) b('charcoal',dx,1.17,dz,.055,.83,.055);
-    b('yellow',0,1.62,-.03,.87,.11,1.03);
-    for(const dx of [-.43,.43]) for(const dz of [-.41,.42]) wheel(dx,.26,dz,.24);
-    for(const dx of [-.30,.30]) {
-      b('charcoal',dx,1.0,.69,.075,1.70,.10);
-      b('steel',dx,.33,1.02,.10,.07,.87);
+
+  // Stylised reconstruction from RTK's published photographs: twin gables,
+  // continuous high windows, blue seams, low side wings and a loading court.
+  b('plinth',0,-.5,1,30.6,.65,24.6);
+  b('bevel',0,-.16,1,30.7,.1,24.7);
+  b('asphalt',0,-.07,1,30.6,.12,24.6);
+  b('road',0,.005,9.5,30,.025,5.8);
+  b('concrete',0,.02,-3,28,.04,12.4);
+  for(let x=-14;x<15;x+=2) b('stripe',x,.025,10.5,1,.022,.08);
+  for(const z of [7.4,12.2]) b('stripe',0,.027,z,29,.02,.06);
+  for(const x of [-13,-9,-5,-1,3,7,13]) b('yellow',x,.04,5.4,.06,.02,3.2);
+  // Pedestrian route safely separated from vehicle lanes.
+  b('trim',-3,.045,2.6,20,.025,1.0);
+  for(const z of [2.08,3.12]) b('yellow',-3,.06,z,20,.02,.055);
+  for(let x=-12.6;x<-10.5;x+=.36) b('white',x,.05,5.15,.18,.02,3.8);
+  b('lightConcrete',-1,.38,-4,18,.72,10);
+  b('white',-1,3.62,-9,18,5.8,.15);
+  b('white',-10,3.62,-4,.15,5.8,10);
+  b('white',8,3.62,-4,.15,5.8,10);
+  // Front wall leaves the blue goods door open.
+  b('white',-8.65,2.55,1,2.7,3.75,.16);
+  b('white',1.45,2.55,1,13.1,3.75,.16);
+  b('white',-1,4.7,1,18,.5,.17);
+  b('glass',-1,5.25,1.02,17.7,.62,.13);
+  b('white',-1,5.97,1,18,.83,.16);
+  for(let x=-9.8;x<8;x+=.75){
+    b('rib',x,2.6,1.105,.027,3.6,.035);
+    b('steel',x,5.25,1.13,.04,.64,.04);
+    b('rib',x,6,1.11,.027,.78,.035);
+  }
+  for(const x of [-10,8]) {
+    b('blue',x,3.7,1.12,.11,6.1,.11);
+    b('blue',x,3.7,-9,.11,6.1,.11);
+    for(let z=-8.7;z<1;z+=.3)b('rib',x+(x<0?-.09:.09),3.5,z,.04,5.4,.035);
+  }
+  // Two low-pitch gables, exactly the recognisable silhouette in the photos.
+  function gable(cx){
+    const shape=new T.Shape();shape.moveTo(-4.5,0);shape.lineTo(0,.9);shape.lineTo(4.5,0);shape.closePath();
+    for(const z of [-9,1.08]){
+      const mesh=new T.Mesh(new T.ShapeGeometry(shape),material.white);mesh.material=material.white.clone();mesh.material.side=T.DoubleSide;
+      mesh.position.set(cx,6.39,z);mesh.castShadow=true;root.add(mesh);
     }
-    b('trim',0,.88,.69,.66,.10,.13);
-    b('wood',0,.48,1.19,.87,.14,.74);
-    crate(0,.56,1.19,.79,.54,.70,2);
+    const saved=parent;parent=roof;
+    for(const side of [-1,1]){
+      b('sheet',cx+side*2.25,6.86,-4,4.6,.12,10.25,0,0,-side*Math.atan(.2));
+      for(let z=-9;z<=1;z+=.32)b('rib',cx+side*2.25,6.95,z,4.6,.035,.035,0,0,-side*Math.atan(.2));
+    }
+    parent=saved;
+    for(const z of [-9.15,1.2])for(const side of [-1,1])rod('blue',[cx,7.33,z],[cx+side*4.55,6.42,z],.13);
+    b('blue',cx,7.32,-4,.13,.13,10.4);
+  }
+  gable(-5.5);gable(3.5);
+  // Blue sectional goods door and curved canopy, left of the main facade.
+  b('black',-6,2.0,1.1,2.5,2.8,.13);
+  for(const dx of [-1.27,1.27]) b('blue',-6+dx,2.03,1.22,.13,2.87,.23);
+  b('blue',-6,3.28,1.2,2.55,.5,.18);
+  for(let x=-7.3;x<-4.7;x+=.2)b('steel',x,3.7+Math.sin((x+7.3)/2.6*Math.PI)*.32,1.5,.22,.065,1.2);
+  // Low side extensions, also present in the source photographs.
+  for(const [x,w,h] of [[-12,4,2.6],[10.5,5,3.2]]){
+    b('lightConcrete',x,.38,-3.8,w,.72,9.6);
+    b('white',x,.7+h/2,-8.6,w,h,.14);
+    for(const side of [-1,1])b('white',x+side*w/2,.7+h/2,-3.8,.12,h,9.6);
+    if(x<0)b('black',x,1.8,1.03,w*.58,2.12,.06);
+    b('blue',x,2.6,1.09,w*.58,.35,.08);
+    for(const dx of [-w*.3,w*.3])b('blue',x+dx,1.8,1.12,.12,2.2,.12);
+    const saved=parent;parent=roof;b('sheet',x,h+.77,-3.8,w+.18,.12,9.8,0,0,x<0?.12:-.12);parent=saved;
+    b('blue',x,h+.78,1.15,w+.18,.12,.13,0,0,x<0?.12:-.12);
+  }
+  // The loading wing is open toward the courtyard; remove its solid body.
+  // Instance is replaced below by wall strips so a forklift can enter the trailer.
+  b('charcoal',10.5,.81,1.38,2.6,.16,.8);
+  for(const x of [8.9,12.1]){c('yellow',x,.45,1.7,.12,.85,.12);c('charcoal',x,.6,1.7,.125,.14,.125);}
+  // Storage visible in cutaway mode, with a clear aisle through the wing.
+  for(const z of [-7,-4])for(const x of [-7,-3,1,5]){
+    for(const dx of [-1.3,1.3])b('blue',x+dx,2.9,z,.09,4.3,.12);
+    for(const y of [1,2.4,3.8]){
+      b('orange',x,y,z,2.8,.12,1.1);
+      for(const dx of [-.75,.1,.85])crate(x+dx,y+.1,z,.65,.75,.85,Math.round((x+8)%3));
+    }
+  }
+  mark(-.6,4.65,1.13,1.0,0,'charcoal','white');
+  // Courtyard landscaping: the island and slender tree seen in RTK photographs.
+  b('concrete',.8,.12,4.5,4.8,.22,1.35);
+  for(let n=0;n<11;n++)b('green',-1.2+n*.4,.48+(n%3)*.09,4.5,.65,.62,.9,0,n*.7);
+  b('wood',.7,2.35,4.5,.12,4.4,.13,.02);
+  for(let n=0;n<7;n++)b('green',.7+Math.sin(n*2)*.45,3.5+n*.23,4.5+Math.cos(n*2)*.3,.9,.7,.65,0,n);
+  // Gatehouse and blue water-tower detail from the front photograph.
+  c('blue',13.6,2.05,-7.8,.13,4.1,.13);c('blue',13.6,4.2,-7.8,.65,.6,.65);
+  for(const x of [-14.5,14.5])for(let z=-10;z<7;z+=2){b('trim',x,.6,z,.045,1.2,.045);b('steel',x,.7,z,.02,.55,2);}
+  function group(build){const g=new T.Group();root.add(g);const old=parent;parent=g;build();parent=old;return g;}
+  const truck=group(()=>vehicle(0,0,0,'yellow',true));
+  const passing=group(()=>vehicle(0,0,0,'white',true));passing.scale.setScalar(.86);
+  // Animated articulated workers, with helmets and high-visibility vests.
+  function worker(x,z){
+    const g=group(()=>{b('yellow',0,.95,0,.28,.38,.19);b('white',0,.95,.105,.28,.05,.025);b('skin',0,1.24,0,.18,.20,.19);b('yellow',0,1.37,0,.23,.10,.23);});
+    g.position.set(x,.08,z);
+    const limbs=[];
+    for(const [dx,y,len,mat] of [[-.09,.76,.45,'charcoal'],[.09,.76,.45,'charcoal'],[-.21,1.1,.34,'yellow'],[.21,1.1,.34,'yellow']]){
+      const pivot=new T.Group();pivot.position.set(dx,y,0);g.add(pivot);
+      const mesh=new T.Mesh(unit,material[mat]);mesh.scale.set(.10,len,.12);mesh.position.y=-len/2;mesh.castShadow=true;pivot.add(mesh);limbs.push(pivot);
+    }
+    return {g,limbs,x,z};
+  }
+  const workers=[worker(-8,2.6),worker(5.6,2.6),worker(13.4,-2)];
+  // Forklift with a separately animated carriage and removable pallet.
+  const fork=group(()=>{
+    b('yellow',0,.4,0,.78,.45,1.10);b('charcoal',0,.68,-.26,.7,.16,.5);
+    for(const dx of [-.37,.37])for(const dz of [-.36,.36])wheel(dx,.23,dz,.21);
+    for(const dx of [-.32,.32])for(const dz of [-.36,.32])b('charcoal',dx,1.0,dz,.045,.8,.045);
+    b('yellow',0,1.43,0,.83,.10,.95);
+    b('yellow',0,.91,-.09,.27,.36,.20);b('skin',0,1.16,-.09,.17,.18,.18);b('yellow',0,1.28,-.09,.22,.08,.22);
+    for(const dx of [-.27,.27])b('charcoal',dx,.88,.63,.07,1.65,.1);
   });
-  parent=root;
-  // Safety bollards, traffic barriers, external piping and plant.
-  for(const x of [-12.02,10.67]) for(const z of [-6.22,-3.02,.06]) {
-    c('yellow',x,.32,z,.14,.62,.14);c('charcoal',x,.4,z,.142,.13,.142);
+  const lift=group(()=>{for(const dx of [-.27,.27])b('steel',dx,0,.92,.09,.06,.85);b('trim',0,.2,.62,.6,.08,.10);});root.remove(lift);fork.add(lift);
+  const cargo=group(()=>{b('wood',0,.10,.98,.84,.12,.74);crate(0,.17,.98,.77,.55,.67,2);});root.remove(cargo);lift.add(cargo);
+  const delivered=group(()=>{b('wood',0,.1,0,.84,.12,.74);crate(0,.17,0,.77,.55,.67,2);});
+  const gate=group(()=>{b('white',1.3,0,0,2.6,.07,.1);for(let x=.1;x<2.6;x+=.35)b('red',x,0,.06,.16,.08,.025);});gate.position.set(-13.4,1,7.3);
+  b('blue',-13.4,.5,7.3,.25,1,.25);
+  root.remove(delivered);truck.add(delivered);
+  const cycle=42;
+  const lerp=(a,b,p)=>a+(b-a)*Math.max(0,Math.min(1,p));
+  const ease=p=>{p=Math.max(0,Math.min(1,p));return p*p*(3-2*p);};
+  function update(time){
+    const t=((time%cycle)+cycle)%cycle;
+    let x=10.5,z=4.45,a=0;
+    if(t<7){x=lerp(-11,10.5,ease(t/7));z=9;a=Math.PI/2;}
+    else if(t<10){z=9;a=lerp(Math.PI/2,0,ease((t-7)/3));}
+    else if(t<15){z=lerp(9,4.45,ease((t-10)/5));}
+    else if(t<29){z=4.45;}
+    else if(t<33){z=lerp(4.45,9,ease((t-29)/4));}
+    else if(t<36){z=9;a=lerp(0,-Math.PI/2,ease((t-33)/3));}
+    else{x=lerp(10.5,-11,ease((t-36)/6));z=9;a=-Math.PI/2;}
+    truck.position.set(x,0,z);truck.rotation.y=a;
+    // A second truck uses the separate outer lane, with no crossing of the loading path.
+    const p=(time%32)/32;passing.position.set(lerp(-12,12,p<.5?p*2:2-p*2),0,12.5);passing.rotation.y=p<.5?Math.PI/2:-Math.PI/2;
+    const loading=t>=15&&t<29;
+    const u=Math.max(0,Math.min(14,t-15));
+    const fz=u<5?lerp(-3.2,2.2,ease(u/5)):u<8?2.2:lerp(2.2,-3.2,ease((u-8)/6));
+    fork.position.set(10.5,.82,loading?fz:-3.2);
+    lift.position.y=loading?lerp(.12,.20,ease(u/4)):.12;
+    cargo.visible=t<22;delivered.visible=t>=22&&t<35;
+    delivered.position.set(0,1.0,-1.2);
+    gate.rotation.z=t<8?-.95:0;
+    workers.forEach((w,i)=>{
+      const phase=time*.45+i*2, span=i===0?2.4:i===1?1.4:2.0;
+      const offset=Math.sin(phase)*span;const forward=Math.cos(phase)>0;
+      w.g.position.set(i<2?w.x+offset:w.x,.08,i<2?w.z:w.z+offset);
+      w.g.rotation.y=i<2?(forward?Math.PI/2:-Math.PI/2):(forward?0:Math.PI);
+      w.limbs.forEach((limb,k)=>limb.rotation.x=Math.sin(time*7+i)*.42*(k%2?-1:1));
+    });
+    return t<15?'arrival':t<29?'loading':'dispatch';
   }
-  for(const x of [-11.71,10.08]){
-    for(let z=-7.24;z<-5.35;z+=.58) c('trim',x,.24,z,.16,.46,.16);
-    rod('yellow',[x,.47,-7.26],[x,.47,-5.49],.08);
-  }
-  // Selective yellow corner markers on the plinth.
-  for(const [x,z] of [[-12.99,8.71],[12.99,8.71],[-12.99,-8.71],[12.99,-8.71]]) {
-    b('yellow',x-Math.sign(x)*.32,.03,z,.70,.02,.045);
-    b('yellow',x,.03,z-Math.sign(z)*.32,.045,.02,.70);
-  }
+  update(18);
+  function setCutaway(show){roof.visible=!show;}
   for(const {shape,mat,parent: target,items} of pools.values()) {
     const mesh=new T.InstancedMesh(shape,mat,items.length);
     items.forEach((m,i)=>mesh.setMatrixAt(i,m));
@@ -271,5 +277,5 @@ export function buildWarehouse() {
     mesh.receiveShadow=true;
     target.add(mesh);
   }
-  return {root,moving};
+  return {root,moving,update,setCutaway,truck,fork,workers,roof};
 }

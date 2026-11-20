@@ -5,7 +5,7 @@ const host = document.querySelector('#warehouse');
 if (host) init(host);
 
 function init(host) {
-  const posterFiles = ['warehouse.webp','view4.webp','view-14.webp'];
+  const posterFiles = ['../assets/areal.webp'];
   const asset = name => window.rtkBundledPosters?.[name] || new URL('scene/' + name, document.baseURI).href;
   const frameUrls = posterFiles.map(asset);
   const pause = document.querySelector('[data-scene-pause]');
@@ -13,8 +13,29 @@ function init(host) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const initialAngle = Math.atan2(23,36);
   let index = 0, paused = reduce.matches, inView = true, hidden = document.hidden;
-  let renderer, scene, camera, moving, observer, timer = 0;
-  let angle = initialAngle, goal = angle, elapsed = 0, activePointer = null, dirty = true, last = 0;
+  let renderer, scene, camera, model, observer, timer = 0;
+  let cutaway=false;
+  const phaseButtons=[...document.querySelectorAll('[data-scene-phase]')];
+  const roofButton=document.querySelector('[data-scene-roof]');
+  const status=document.querySelector('[data-scene-status]');
+  const phaseNames={arrival:"Příjezd k rampě",loading:"Nakládka palet",dispatch:"Expedice zásilky"};
+  let shownPhase="";
+  function showPhase(phase){
+    if(phase===shownPhase)return;shownPhase=phase;
+    phaseButtons.forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.scenePhase===phase)));
+    status.textContent=phaseNames[phase];
+  }
+  phaseButtons.forEach(button=>button.addEventListener("click",()=>{
+    if(!model)return;
+    elapsed={arrival:0,loading:16,dispatch:29}[button.dataset.scenePhase];
+    paused=false;states();goal=initialAngle;showPhase(model.update(elapsed));refresh();
+  }));
+  roofButton?.addEventListener("click",()=>{
+    if(!model)return;cutaway=!cutaway;model.setCutaway(cutaway);
+    roofButton.setAttribute("aria-pressed",String(cutaway));
+    roofButton.textContent=cutaway?"Zavřít střechu":"Nahlédnout dovnitř";refresh();
+  });
+  let angle = initialAngle, goal = angle, elapsed = 18, activePointer = null, dirty = true, last = 0;
   let orbitCanvas, orbitContext, atlas, orbitReady=false, orbitTimer=0, orbitIndex=0, zoom=1;
   const zoomButton=document.querySelector('[data-scene-zoom]');
   function paintOrbit(){
@@ -75,22 +96,8 @@ function init(host) {
     renderer=null;
     poster.hidden=false;
     poster.style.opacity='1';
-    if(!atlas){
-      atlas=new Image();
-      orbitCanvas=document.createElement('canvas');
-      orbitCanvas.width=600; orbitCanvas.height=380;
-      orbitCanvas.className='orbit-canvas';
-      orbitContext=orbitCanvas.getContext('2d');
-      atlas.onload=()=>{
-        if(!orbitContext)return;
-        orbitReady=true;
-        host.append(orbitCanvas);
-        poster.style.opacity='0';
-        host.dataset.sceneState='turntable';
-        paintOrbit();orbitClock();
-      };
-      atlas.src=asset('orbit.webp');
-    }
+    status.textContent='Fotografie areálu · 3D není v tomto prohlížeči dostupné';
+    for(const control of [...phaseButtons,roofButton,turn,pause])if(control)control.disabled=true;
     states();
     refresh();
   }
@@ -100,7 +107,7 @@ function init(host) {
     const w=host.clientWidth,h=host.clientHeight;
     if(!w||!h)return;
     const aspect=w/h;
-    const frame=Math.max(34.6,21.95*aspect);
+    const frame=Math.max(40,26*aspect);
     camera.left=-frame/2;camera.right=frame/2;
     camera.top=frame/2/aspect;camera.bottom=-camera.top;camera.updateProjectionMatrix();
     renderer.setSize(w,h,false);
@@ -125,15 +132,14 @@ function init(host) {
       canvas.setAttribute('aria-hidden','true');
       scene=new T.Scene();
       camera=new T.OrthographicCamera(-17.3,17.3,11,-11,.1,135);
-      const model=buildWarehouse();
-      moving=model.moving;
+      model=buildWarehouse();
       scene.add(model.root);
       const hemi=new T.HemisphereLight(0xeaf8ff,0xa3a29a,1.6);
       const key=new T.DirectionalLight(0xffead0,2.70);
       key.position.set(-13,24,20);
       key.castShadow=true;
       key.shadow.mapSize.set(2048,2048);
-      Object.assign(key.shadow.camera,{left:-19,right:19,top:16,bottom:-16,near:1,far:82});
+      Object.assign(key.shadow.camera,{left:-23,right:23,top:22,bottom:-22,near:1,far:82});
       key.shadow.camera.updateProjectionMatrix();
       key.shadow.bias=-.0004;key.shadow.normalBias=.021;
       const rim=new T.DirectionalLight(0xd3e7ff,1.5);
@@ -147,7 +153,7 @@ function init(host) {
         panel.position.set(x,y,z);panel.lookAt(0,0,0);env.add(panel);
       }
       const pmrem=new T.PMREMGenerator(renderer);
-      const envTarget=pmrem.fromScene(env,.05,.1,50);
+      const envTarget=pmrem.fromScene(env,.03,.1,50);
       scene.environment=envTarget.texture;
       pmrem.dispose();
       env.traverse(mesh=>{mesh.geometry?.dispose();mesh.material?.dispose();});
@@ -167,13 +173,13 @@ function init(host) {
     if(dirty || !paused || rotating){
       if(!paused){
         elapsed+=dt;
-        if(activePointer===null) goal+=dt*.15;
+        // The camera stays still so the operating cycle remains legible.
       }
       angle+= (goal-angle) * (reduce.matches ? 1 : 1-Math.exp(-8*Math.max(dt,.005)));
       const view=angle;
       camera.position.set(Math.sin(view)*42.7,25.7,Math.cos(view)*42.7);
-      camera.lookAt(0,1.7,0);
-      moving.position.x=6.30+Math.sin(elapsed*.41)*.90;
+      camera.lookAt(0,1.4,1);
+      showPhase(model.update(elapsed));
       try{renderer.render(scene,camera);}catch{staticMode();return;}
       poster.style.opacity='0';
       dirty=false;

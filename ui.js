@@ -82,7 +82,7 @@ document.getElementById('copy-inquiry').addEventListener('click', async () => {
 const filmLink = document.querySelector('.film-link');
 const filmDialog = document.getElementById('orbit-film');
 const orbitVideo = filmDialog.querySelector('video');
-filmLink.addEventListener('click', event => {
+filmLink?.addEventListener('click', event => {
   if (typeof filmDialog.showModal !== 'function') return;
   event.preventDefault();
   if (!orbitVideo.hasAttribute('src')) orbitVideo.src = filmLink.href;

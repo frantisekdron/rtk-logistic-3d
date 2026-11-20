@@ -29,7 +29,17 @@ async function verify(browser, {name, mobile, fallback}) {
     const model = page.locator('#warehouse');
     await model.scrollIntoViewIfNeeded();
     await page.waitForFunction(wanted => document.querySelector('#warehouse')?.dataset.sceneState===wanted,
-      fallback?'turntable':'ready',{timeout:45000});
+      fallback?'poster':'ready',{timeout:45000});
+    assert.equal(await page.locator('.partner-list li').count(),6);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'No horizontal overflow');
+    if(fallback){
+      assert.ok(await model.locator('img').evaluate(img=>img.complete&&img.naturalWidth>0));
+      assert.equal(await page.locator('[data-scene-phase=loading]').isDisabled(),true);
+      await page.screenshot({path:artifacts+'/'+name+'.png'});
+      assert.deepEqual(errors,[]);
+      console.log('PASS',name,'real-photo fallback, disabled 3D controls, client references');
+      return;
+    }
     await page.waitForFunction(()=>document.querySelector('#warehouse img').style.opacity==='0');
     const canvas = model.locator('canvas');
     const signature = async () => digest(await canvas.screenshot());
@@ -58,11 +68,20 @@ async function verify(browser, {name, mobile, fallback}) {
     await page.screenshot({path:artifacts+'/'+name+'.png'});
     await page.locator('[data-expand-model]').click();
     await page.locator('main #warehouse').waitFor({state:'visible'});
-    await page.locator('.film-link').click();
-    await page.waitForFunction(()=>document.querySelector('#orbit-film video').currentTime>0,{},{timeout:20000});
-    await page.locator('#orbit-film button').click();
+    await page.locator('[data-scene-roof]').click();
+    assert.equal(await page.locator('[data-scene-roof]').getAttribute('aria-pressed'),'true');
+    await page.locator('[data-scene-phase=arrival]').click();
+    assert.equal(await model.getAttribute('data-paused'),'false');
+    assert.equal(await page.locator('[data-scene-status]').textContent(),'Příjezd k rampě');
+    const running=await signature();await changed(running);
+    await page.locator('[data-scene-phase=loading]').click();
+    assert.equal(await page.locator('[data-scene-status]').textContent(),'Nakládka palet');
+    await page.locator('[data-scene-phase=dispatch]').click();
+    assert.equal(await page.locator('[data-scene-status]').textContent(),'Expedice zásilky');
+    await page.locator('[data-scene-pause]').click();
+    assert.equal(await model.getAttribute('data-paused'),'true');
     assert.deepEqual(errors,[]);
-    console.log('PASS',name,'visible canvas, 45° turn, drag, zoom, enlarged view, MP4 playback');
+    console.log('PASS',name,'3D scene, turn, drag, zoom, enlarged view, cutaway, operation phases and pause');
   } finally { await context.close(); }
 }
 (async()=>{
