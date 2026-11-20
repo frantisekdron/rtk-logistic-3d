@@ -57,7 +57,7 @@ async function verify(browser, {name, mobile, fallback}) {
     assert.ok(await page.locator('#model-dialog').evaluate(el=>el.open));
     await page.screenshot({path:artifacts+'/'+name+'.png'});
     await page.locator('[data-expand-model]').click();
-    assert.ok(await page.locator('main #warehouse').count());
+    await page.locator('main #warehouse').waitFor({state:'visible'});
     await page.locator('.film-link').click();
     await page.waitForFunction(()=>document.querySelector('#orbit-film video').currentTime>0,{},{timeout:20000});
     await page.locator('#orbit-film button').click();
