@@ -19,21 +19,55 @@ function init(host) {
   const roofButton=document.querySelector('[data-scene-roof]');
   const status=document.querySelector('[data-scene-status]');
   const phaseNames={arrival:"Příjezd k rampě",loading:"Nakládka palet",dispatch:"Expedice zásilky"};
-  let shownPhase="";
+  const consolePanel=document.querySelector('.dispatch-console');
+  const timeSlider=document.querySelector('[data-scene-time]');
+  const timeOutput=document.querySelector('[data-cycle-time]');
+  const cameraSlider=document.querySelector('[data-camera-angle]');
+  const cameraOutput=document.querySelector('[data-camera-value]');
+  const command=document.querySelector('[data-dispatch-command]');
+  const commandLabel=document.querySelector('[data-command-label]');
+  const missionDetail=document.querySelector('[data-mission-detail]');
+  const announcement=document.querySelector('[data-dispatch-announcement]');
+  const commandNames={arrival:'Přistavit k rampě',loading:'Odbavit kamion',dispatch:'Přijmout další vůz'};
+  let shownPhase="", lastTelemetry=-1;
+  function telemetry(){
+    const t=((elapsed%42)+42)%42;
+    const tick=Math.floor(t*10);
+    if(tick===lastTelemetry)return;lastTelemetry=tick;
+    timeSlider.value=t;
+    timeSlider.setAttribute('aria-valuetext',`${Math.floor(t)} sekund z 42`);
+    timeSlider.style.setProperty('--progress',`${t/42*100}%`);
+    timeOutput.textContent=`00:${String(Math.floor(t)).padStart(2,'0')} / 00:42`;
+    missionDetail.textContent=t<7?'Brána otevřena. Kamion přijíždí.':t<15?'Kamion couvá k nakládací rampě.':t<22?'Vozík přiváží paletu k návěsu.':t<29?'Paleta naložena. Vozík uvolňuje rampu.':'Zásilka na cestě. Rampa se uvolňuje.';
+  }
+  function selectPhase(phase){
+    if(!model||!renderer)return;
+    elapsed={arrival:0,loading:15,dispatch:29}[phase];
+    paused=false;lastTelemetry=-1;states();showPhase(model.update(elapsed));telemetry();refresh();
+    announcement.textContent=phaseNames[phase]+'. Pokyn přijat.';
+  }
+  timeSlider.addEventListener('input',()=>{
+    if(!model||!renderer)return;
+    elapsed=Number(timeSlider.value);paused=true;states();showPhase(model.update(elapsed));telemetry();refresh();
+  });
+  cameraSlider.addEventListener('input',()=>{
+    if(!renderer)return;
+    goal=initialAngle+Number(cameraSlider.value)*Math.PI/180;
+    cameraOutput.textContent=cameraSlider.value+'°';refresh();
+  });
+  command.addEventListener('click',()=>selectPhase({arrival:'loading',loading:'dispatch',dispatch:'arrival'}[shownPhase]||'arrival'));
   function showPhase(phase){
     if(phase===shownPhase)return;shownPhase=phase;
     phaseButtons.forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.scenePhase===phase)));
     status.textContent=phaseNames[phase];
+    consolePanel.dataset.phase=phase;
+    commandLabel.textContent=commandNames[phase];
   }
-  phaseButtons.forEach(button=>button.addEventListener("click",()=>{
-    if(!model)return;
-    elapsed={arrival:0,loading:16,dispatch:29}[button.dataset.scenePhase];
-    paused=false;states();goal=initialAngle;showPhase(model.update(elapsed));refresh();
-  }));
+  phaseButtons.forEach(button=>button.addEventListener("click",()=>selectPhase(button.dataset.scenePhase)));
   roofButton?.addEventListener("click",()=>{
     if(!model)return;cutaway=!cutaway;model.setCutaway(cutaway);
     roofButton.setAttribute("aria-pressed",String(cutaway));
-    roofButton.textContent=cutaway?"Zavřít střechu":"Nahlédnout dovnitř";refresh();
+    refresh();
   });
   let angle = initialAngle, goal = angle, elapsed = 18, activePointer = null, dirty = true, last = 0;
   let orbitCanvas, orbitContext, atlas, orbitReady=false, orbitTimer=0, orbitIndex=0, zoom=1;
@@ -72,6 +106,7 @@ function init(host) {
   function states(){
     host.dataset.sceneState = renderer ? 'ready' : orbitReady ? 'turntable' : 'poster';
     host.dataset.paused = String(paused);
+    consolePanel.dataset.paused=String(paused);
     if (pause) {
       const label = paused ? 'Spustit animaci' : 'Pozastavit animaci';
       pause.setAttribute('aria-label',label);
@@ -97,7 +132,8 @@ function init(host) {
     poster.hidden=false;
     poster.style.opacity='1';
     status.textContent='Fotografie areálu · 3D není v tomto prohlížeči dostupné';
-    for(const control of [...phaseButtons,roofButton,turn,pause])if(control)control.disabled=true;
+    for(const control of [...phaseButtons,roofButton,turn,pause,timeSlider,cameraSlider,command])if(control)control.disabled=true;
+    missionDetail.textContent='Pro interaktivní pult otevřete web v prohlížeči s podporou 3D.';
     states();
     refresh();
   }
@@ -180,6 +216,7 @@ function init(host) {
       camera.position.set(Math.sin(view)*42.7,25.7,Math.cos(view)*42.7);
       camera.lookAt(0,1.4,1);
       showPhase(model.update(elapsed));
+      telemetry();
       try{renderer.render(scene,camera);}catch{staticMode();return;}
       poster.style.opacity='0';
       dirty=false;
@@ -225,6 +262,8 @@ function init(host) {
     if(renderer){
       renderer.domElement.style.cursor='grabbing';
       goal=startAngle-dx/Math.max(host.clientWidth,240)*Math.PI*1.4;
+      const degrees=Math.round(((goal-initialAngle)*180/Math.PI+540)%360-180);
+      cameraSlider.value=degrees;cameraOutput.textContent=degrees+'°';
       refresh();
     }
   });

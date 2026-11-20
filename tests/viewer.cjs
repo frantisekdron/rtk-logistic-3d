@@ -48,7 +48,7 @@ async function verify(browser, {name, mobile, fallback}) {
       for(let i=0;i<12;i++) {if(await signature()!==old)return;}
       assert.fail('Model pixels did not change after the interaction');
     };
-    await page.locator('[data-scene-turn]').click();await changed(first);
+    await page.locator('[data-camera-angle]').fill('45');await changed(first);
     const second=await signature();
     const bounds=await canvas.boundingBox();
     assert.ok(bounds.width>200 && bounds.height>150);
@@ -62,7 +62,17 @@ async function verify(browser, {name, mobile, fallback}) {
       await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x-112,y+1,{steps:12});await page.mouse.up();
     }
     await changed(second);
-    const third=await signature();await page.locator('[data-scene-zoom]').click();await changed(third);
+    const third=await signature();
+    await page.locator('[data-scene-time]').fill('5');await changed(third);
+    assert.equal(await model.getAttribute('data-paused'),'true');
+    assert.match(await page.locator('[data-cycle-time]').textContent(),/00:05/);
+    assert.equal(await page.locator('[data-scene-status]').textContent(),'Příjezd k rampě');
+    await page.locator('[data-dispatch-command]').click();
+    assert.equal(await page.locator('[data-scene-status]').textContent(),'Nakládka palet');
+    await page.locator('[data-dispatch-command]').click();
+    assert.equal(await page.locator('[data-scene-status]').textContent(),'Expedice zásilky');
+    await page.locator('[data-dispatch-command]').click();
+    assert.equal(await page.locator('[data-scene-status]').textContent(),'Příjezd k rampě');
     await page.locator('[data-expand-model]').click();
     assert.ok(await page.locator('#model-dialog').evaluate(el=>el.open));
     await page.screenshot({path:artifacts+'/'+name+'.png'});
@@ -81,7 +91,7 @@ async function verify(browser, {name, mobile, fallback}) {
     await page.locator('[data-scene-pause]').click();
     assert.equal(await model.getAttribute('data-paused'),'true');
     assert.deepEqual(errors,[]);
-    console.log('PASS',name,'3D scene, turn, drag, zoom, enlarged view, cutaway, operation phases and pause');
+    console.log('PASS',name,'3D scene, camera slider, drag, timeline seek, dispatch commands, enlarged view, cutaway, phases and pause');
   } finally { await context.close(); }
 }
 (async()=>{

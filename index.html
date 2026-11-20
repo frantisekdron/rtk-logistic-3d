@@ -7,8 +7,8 @@
   <title>RTK Logistic — Logistika v pohybu</title>
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="preload" href="assets/manrope.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=20261120-3">
-  <script src="ui.js?v=20261120-3" defer></script>
+  <link rel="stylesheet" href="style.css?v=20261120-4">
+  <script src="ui.js?v=20261120-4" defer></script>
 </head>
 <body>
   <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -44,18 +44,26 @@
           <div class="hero-actions"><a class="btn prime" href="#sluzby">Prozkoumat služby</a><a class="quiet-link" href="#kontakt">Kontaktovat nás</a></div>
         </div>
         <figure class="model"><button class="expand-model" type="button" data-expand-model aria-haspopup="dialog" aria-label="Otevřít velký model">⛶ <span>Zvětšit náhled</span></button>
-          <div class="viewport"><noscript><style>#warehouse,.scene-buttons,.operation-controls{display:none!important}</style><img src="assets/areal.webp" alt="Skutečný skladový areál RTK v Zápech"></noscript><div id="warehouse" tabindex="0" role="group" aria-describedby="scene-help" aria-label="Animovaný model inspirovaný areálem RTK v Zápech: kamiony, nakládka palet a pracovníci"></div></div>
-          <div class="operation-controls">
-            <div class="operation-heading"><span>ZÁPY V POHYBU</span><span data-scene-status>Nakládka palet</span></div>
-            <div class="operation-phases" role="group" aria-label="Vybrat fázi provozu">
-              <button data-scene-phase="arrival" aria-pressed="false"><svg class="ico"><use href="#truck"/></svg>Příjezd</button>
-              <button data-scene-phase="loading" aria-pressed="true"><svg class="ico"><use href="#pallet"/></svg>Nakládka</button>
-              <button data-scene-phase="dispatch" aria-pressed="false"><svg class="ico"><use href="#layers"/></svg>Expedice</button>
+          <div class="viewport"><noscript><style>#warehouse,.dispatch-console{display:none!important}</style><img src="assets/areal.webp" alt="Skutečný skladový areál RTK v Zápech"></noscript><div id="warehouse" tabindex="0" role="group" aria-describedby="scene-help" aria-label="Animovaný model inspirovaný areálem RTK v Zápech: kamiony, nakládka palet a pracovníci"></div></div>
+          <figcaption class="dispatch-console" aria-label="Dispečerský pult — interaktivní ukázka">
+            <header class="dispatch-header"><div><span class="console-eyebrow">RTK / CONTROL ROOM</span><strong>Teď jste dispečer.</strong></div><span class="simulation-badge"><i></i> SIMULACE</span></header>
+            <div class="dispatch-route" role="group" aria-label="Vybrat fázi provozu">
+              <button data-scene-phase="arrival" aria-pressed="false"><span class="route-node"><svg class="ico" aria-hidden="true"><use href="#truck"/></svg></span><span><small>01 / BRÁNA</small>Příjezd</span></button>
+              <button data-scene-phase="loading" aria-pressed="true"><span class="route-node"><svg class="ico" aria-hidden="true"><use href="#pallet"/></svg></span><span><small>02 / RAMPA</small>Nakládka</span></button>
+              <button data-scene-phase="dispatch" aria-pressed="false"><span class="route-node"><svg class="ico" aria-hidden="true"><use href="#layers"/></svg></span><span><small>03 / TRASA</small>Expedice</span></button>
             </div>
-          </div>
-          <figcaption class="scene-legend">
-            <span class="scene-label"><svg class="ico"><use href="#cube"/></svg><span id="scene-help">Otáčejte tahem · vyzkoušejte provoz</span></span>
-            <div class="scene-buttons" role="group" aria-label="Ovládání modelu"><button data-scene-roof aria-pressed="false">Nahlédnout dovnitř</button><button data-scene-turn title="Pootočit model" aria-label="Pootočit model"><svg class="ico"><use href="#rotate"/></svg><span>Otočit</span></button><button data-scene-zoom aria-pressed="false">Přiblížit</button><button data-scene-pause title="Pozastavit nebo spustit animaci" aria-label="Pozastavit animaci" aria-pressed="false"><svg class="ico"><use href="#pause"/></svg></button></div>
+            <div class="dispatch-mission">
+              <div class="mission-readout"><span class="console-eyebrow">ZÁSILKA RTK–001</span><strong data-scene-status>Nakládka palet</strong><span class="mission-detail" data-mission-detail>Vozík přiváží paletu k návěsu.</span></div>
+              <button class="dispatch-command" data-dispatch-command><span data-command-label>Odbavit kamion</span><span aria-hidden="true">↗</span></button>
+            </div>
+            <div class="dispatch-timeline"><div class="timeline-labels"><label for="operation-time">PRŮBĚH ZAKÁZKY <span>· posuňte čas</span></label><output for="operation-time" data-cycle-time>00:18 / 00:42</output></div><input id="operation-time" data-scene-time type="range" min="0" max="41.9" step="0.1" value="18" aria-label="Čas simulace" aria-valuetext="18 sekund"><div class="time-markers" aria-hidden="true"><span>BRÁNA</span><span>NAKLÁDKA</span><span>VÝJEZD</span></div></div>
+            <div class="console-tools">
+              <label class="camera-control"><svg class="ico" aria-hidden="true"><use href="#rotate"/></svg><span>Kamera</span><input type="range" data-camera-angle min="-180" max="180" value="0" step="1" aria-label="Úhel kamery"><output data-camera-value>0°</output></label>
+              <button class="roof-switch" data-scene-roof aria-pressed="false"><span class="switch-track" aria-hidden="true"><i></i></span><span>Průhled halou</span></button>
+              <button class="console-pause" data-scene-pause title="Pozastavit animaci" aria-label="Pozastavit animaci" aria-pressed="false"><svg class="ico" aria-hidden="true"><use href="#pause"/></svg></button>
+            </div>
+            <span id="scene-help" class="console-footnote">Řiďte ukázkový provoz. Modelem otáčejte tahem.</span>
+            <span class="sr-only" data-dispatch-announcement role="status" aria-live="polite"></span>
           </figcaption>
         </figure>
       </div>
@@ -108,5 +116,5 @@
     <h2 id="inquiry-title">Poptávka služeb</h2><p class="form-intro">Vyplňte podrobnosti a otevřete si připravený e-mail pro tým v Zápech.</p>
     <form id="inquiry-form"><label>Služba<select name="service"><option>Skladování</option><option>Kompletace zásilek</option><option>Kamionová doprava</option><option>Servis pro DIY řetězce</option><option>Kombinace služeb</option></select></label><label>Firma nebo jméno<input name="company" autocomplete="organization" required maxlength="120"></label><label>Co potřebujete zajistit?<textarea rows="4" name="message" required maxlength="1600" placeholder="Např. počet palet, místo a požadovaný termín…"></textarea></label><button type="submit" class="btn prime"><svg class="ico"><use href="#email"/></svg> Otevřít v e-mailu</button><button type="button" class="copy-text" id="copy-inquiry">Zkopírovat text poptávky</button><p role="status" id="form-status"></p></form>
   </dialog>
-  <script type="module" src="scene/scene.js?v=20261120-3"></script>
+  <script type="module" src="scene/scene.js?v=20261120-4"></script>
 </body></html>
