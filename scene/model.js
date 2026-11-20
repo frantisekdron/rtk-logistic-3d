@@ -7,7 +7,7 @@ const palette = {
   steel: ['#ced4ce',.52,.39], sheet: ['#a9b6b9',.49,.54], rib: ['#cad1cd',.54,.45],
   trim: ['#6d7f83',.61,.39], charcoal: ['#26363c',.45,.51], black: ['#162127',.18,.65],
   glass: ['#416575',.60,.23], clear: ['#6c9298',.54,.22], screen: ['#a9d4cc',.32,.33],
-  white: ['#e6ebe1',.19,.47], yellow: ['#d4ec51',.12,.5], orange: ['#ce743c',.29,.57],
+  brandGreen: ['#009524',.16,.43], white: ['#e6ebe1',.19,.47], yellow: ['#d4ec51',.12,.5], orange: ['#ce743c',.29,.57],
   red: ['#b93c2c',.19,.5], wood: ['#98734d',.01,.82], box1: ['#b98852',.02,.77],
   box2: ['#cfa572',.03,.78], box3: ['#ddbe91',.03,.78], tape: ['#e3c99b',.02,.78],
   tire: ['#192022',.04,.85], hub: ['#c0cccf',.65,.38], stripe: ['#c3c8b1',.02,.82],
@@ -97,7 +97,7 @@ export function buildWarehouse() {
         b('trim',dx,1.48,-.46,.028,.06,2*end-.20);
         for(let dz=-end-.30;dz<end-.55;dz+=.165) b('sheet',dx,1.50,dz,.027,1.18,.020);
       }
-      b('yellow',.77,1.66,-.4,.04,.19,2*end-.48);
+      b('brandGreen',.77,1.66,-.4,.04,.19,2*end-.48);
       mark(.793,1.62,-.48,.37,Math.PI/2,'white','charcoal');
       for(const dz of [-end+.04,-end+.68,end-.19]) for(const dx of [-.67,.67]) wheel(dx,.40,dz,.36);
       b(color,0,1.11,end+.38,1.47,1.19,1.37);
@@ -206,7 +206,7 @@ export function buildWarehouse() {
   c('blue',13.6,2.05,-7.8,.13,4.1,.13);c('blue',13.6,4.2,-7.8,.65,.6,.65);
   for(const x of [-14.5,14.5])for(let z=-10;z<7;z+=2){b('trim',x,.6,z,.045,1.2,.045);b('steel',x,.7,z,.02,.55,2);}
   function group(build){const g=new T.Group();root.add(g);const old=parent;parent=g;build();parent=old;return g;}
-  const truck=group(()=>vehicle(0,0,0,'yellow',true));
+  const truck=group(()=>vehicle(0,0,0,'brandGreen',true));
   const passing=group(()=>vehicle(0,0,0,'white',true));passing.scale.setScalar(.86);
   // Animated articulated workers, with helmets and high-visibility vests.
   function worker(x,z,job) {

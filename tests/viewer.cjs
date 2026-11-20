@@ -29,10 +29,23 @@ async function verify(browser, {name, mobile, fallback, reduced}) {
     await page.waitForFunction(()=>document.querySelector('.yard-poster').hidden);
     const truck = yard.locator('button');
     const phase = value => page.locator('.model[data-story="'+value+'"]').waitFor();
-    const pixels = async () => createHash('sha256').update(await yard.locator('canvas[data-active]').screenshot()).digest('hex');
+    // Capture the viewport-cropped yard; a composited canvas element can retain a
+    // stale layer screenshot on mobile after a renderer switches.
+    const pixels = async () => {
+      const box=await yard.boundingBox();
+      const screen=page.viewportSize();
+      const x=Math.max(0,Math.ceil(box.x)), y=Math.max(0,Math.ceil(box.y));
+      const width=Math.min(screen.width-x,Math.floor(box.x+box.width)-x);
+      const height=Math.min(screen.height-y,Math.floor(box.y+box.height)-y);
+      assert.ok(width>120 && height>100);
+      return createHash('sha256').update(await page.screenshot({clip:{x,y,width,height}})).digest('hex');
+    };
     const start = await pixels();
     assert.equal(await page.locator('.dispatch-console,input[type=range]').count(),0);
-    assert.equal(await page.locator('.partner-list li').count(),6);
+    const logos=page.locator('.partner-list img');
+    assert.deepEqual(await logos.evaluateAll(nodes=>nodes.map(img=>img.alt)),['BAUHAUS','OBI','HORNBACH','Globus','baumax','UNI HOBBY']);
+    assert.ok(await logos.evaluateAll(async nodes=>{await Promise.all(nodes.map(img=>img.decode()));return nodes.every(img=>img.naturalWidth>0);}));
+    assert.equal(await page.locator('.header-cta').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(0, 149, 36)');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
     await page.waitForTimeout(420);
     if (reduced) assert.equal(await pixels(),start,'Reduced motion holds until requested');
@@ -67,8 +80,13 @@ async function verify(browser, {name, mobile, fallback, reduced}) {
       await page.waitForTimeout(1800);
       const parked=await truck.boundingBox();
       const active=await pixels();
-      await page.waitForTimeout(480);
-      assert.notEqual(await pixels(),active,'Other actors still move when the truck is waiting');
+      let changed=false;
+      for(let i=0;i<8 && !changed;i++){
+        await page.waitForTimeout(200);
+        changed=await pixels()!==active;
+      }
+      console.log('Parked scene',name,await yard.evaluate(el=>({mode:el.dataset.sceneState,visible:document.visibilityState,canvases:el.querySelectorAll('canvas').length,rect:el.getBoundingClientRect().toJSON()})));
+      assert.ok(changed,'Other actors still move when the truck is waiting');
       const still=await truck.boundingBox();
       assert.ok(Math.abs(parked.x-still.x)<1 && Math.abs(parked.y-still.y)<1);
     }

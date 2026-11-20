@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {buildWarehouse} from './model.js?v=yard-motion1';
+import {buildWarehouse} from './model.js?v=green2';
 import {truckPoseAt} from './route.js?v=yard-motion1';
 import {createStory} from './story.js?v=yard-motion1';
 
@@ -13,7 +13,7 @@ const icon = target.querySelector('use');
 const status = document.getElementById('yard-status');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const words = {
-  idle: ['Naložit paletu', 'Naložit paletu do žlutého kamionu', 'pallet'],
+  idle: ['Naložit paletu', 'Naložit paletu do zeleného kamionu', 'pallet'],
   docking: ['Couvám k rampě…', 'Kamion couvá k rampě.', 'truck'],
   loading: ['Ještě tuhle krabici…', 'Vozík nakládá paletu do kamionu.', 'pallet'],
   ready: ['Naloženo. Jedem?', 'Naloženo. Poslat kamion na cestu', 'truck'],
@@ -154,7 +154,7 @@ function start() {
   }
 }
 
-// Project the truck body with the same camera used to render the yard and its baked frames.
+// Project the truck body with the same camera used by both renderers.
 function followTruck(time, zoom, panX, panY) {
   const {x, z, heading} = truckPoseAt(time);
   const sin = Math.sin(heading), cos = Math.cos(heading);
@@ -194,7 +194,8 @@ function adaptResolution(dt) {
 function draw(now) {
   timer=0;
   if (!visible || document.hidden || (!renderer && !software)) return;
-  const dt=last ? Math.min(.10,(now-last)/1000) : 0;
+  const gap=last?(now-last)/1000:0;
+  const dt=Math.min(.1,gap);
   last=now;
   story.update(dt,motion.matches);
   if (!motion.matches) yardTime+=dt;
@@ -205,7 +206,7 @@ function draw(now) {
   surface.style.transform='translate('+panX+'px,'+panY+'px) scale('+zoom+')';
   model.update(story.time,yardTime);
   if (renderer) {
-    if (!motion.matches) adaptResolution(dt);
+    if (!motion.matches) adaptResolution(Math.min(gap,.6));
     if (now-shadowTime>=42 || motion.matches || shadowTime<0) {
       renderer.shadowMap.needsUpdate=true;
       shadowTime=now;
