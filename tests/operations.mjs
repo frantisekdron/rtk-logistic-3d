@@ -20,3 +20,26 @@ for(let t=0;t<84;t+=.125){
 m.update(18);const frozen=m.workers.map(w=>w.g.position.toArray());
 m.update(18);assert.deepEqual(m.workers.map(w=>w.g.position.toArray()),frozen,'Same simulation time must keep all actors paused');
 console.log('PASS: dock dwell, pallet approach, departure, roof interaction, actor bounds and deterministic pause');
+
+const {createStory} = await import('../scene/story.js');
+for (const start of [0, 8, 16, 24, 36]) {
+  const states = [];
+  const story = createStory(next=>states.push(next));
+  while (Math.abs(story.time-start)>.06) story.update(1/30,false,false);
+  story.load(false);
+  story.load(false);
+  for (let i=0;i<650 && story.stage!=='ready';i++) story.update(1/60,false,false);
+  assert.equal(story.stage,'ready');
+  const dockTime=story.time;
+  story.update(30,false,false);
+  assert.equal(story.time,dockTime,'The loaded truck waits for the visitor');
+  story.load(false);
+  for (let i=0;i<400 && story.stage!=='idle';i++) story.update(1/60,false,false);
+  assert.deepEqual(states.slice(-3),['driving','sent','idle']);
+}
+const reduced=createStory(()=>{});
+reduced.update(5,true,false);
+assert.equal(reduced.time,15);
+reduced.load(true);assert.equal(reduced.stage,'ready');
+reduced.load(true);assert.equal(reduced.stage,'sent');
+console.log('PASS: truck interaction from all route phases, duplicate clicks, dispatch, reset and reduced motion');

@@ -12,6 +12,6 @@ BAUHAUS, OBI, Baumax, Hornbach, Globus a Tesco jsou výslovně uvedeny v původn
 
 ## Provoz a úpravy
 
-GitHub Pages publikuje kořen větve `main`. Aktivní zdroje jsou `scene/model.js` a `scene/scene.js` (ES moduly); starý `rtk-3d.js` již stránka nenačítá. Běží 42sekundový ilustrační cyklus. Fáze lze zvolit ručně, pohyb pozastavit, střechu skrýt, model otáčet a zvětšit. Systémové omezení pohybu se respektuje při načtení; výslovné zvolení fáze animaci spustí. Bez WebGL se zobrazí skutečná fotografie areálu a ovládání 3D je vypnuté.
+GitHub Pages publikuje kořen větve `main`. Model automaticky přehrává příjezd, nakládku a odjezd. Kliknutí na žlutý kamion nebo jeho bublinu přiblíží rampu a zahájí nakládku. Po druhém kliknutí kamion odjede. Stejný postup funguje klávesnicí a bez WebGL. Záložní animace používá 168 předrenderovaných snímků téhož modelu. Při zapnutém omezení pohybu se scéna sama nehýbe a mezi fázemi přechází ihned.
 
 Kontrola logiky: `node tests/operations.mjs`. Ručně spustitelný GitHub workflow kontroluje publikovaný web v desktopovém, mobilním a záložním režimu.

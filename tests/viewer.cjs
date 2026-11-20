@@ -1,108 +1,71 @@
-const { chromium } = require('playwright-core');
+const {chromium} = require('playwright-core');
 const assert = require('node:assert/strict');
-const { createHash } = require('node:crypto');
+const {createHash} = require('node:crypto');
 const fs = require('node:fs');
 
-const url = process.env.SITE_URL;
-const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const artifacts = 'viewer-results';
 fs.mkdirSync(artifacts, {recursive:true});
-
-async function verify(browser, {name, mobile, fallback}) {
+async function verify(browser, {name, mobile, fallback, reduced}) {
   const context = await browser.newContext({
     viewport: mobile ? {width:390,height:844} : {width:1440,height:900},
-    reducedMotion:'reduce', hasTouch:mobile, isMobile:mobile
+    reducedMotion: reduced ? 'reduce' : 'no-preference', hasTouch:mobile, isMobile:mobile
   });
+  const page = await context.newPage();
+  page.setDefaultTimeout(20000);
   try {
-    if (fallback) await context.addInitScript(() => {
-      const get = HTMLCanvasElement.prototype.getContext;
-      HTMLCanvasElement.prototype.getContext = function(type, ...args) {
-        if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') return null;
-        return get.call(this,type,...args);
+    if (fallback) await page.addInitScript(() => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function(type,...args) {
+        return type.startsWith('webgl') ? null : original.call(this,type,...args);
       };
     });
-    const page = await context.newPage();
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    page.on('console', e => { if(e.type()==='error') errors.push(e.text()); });
-    await page.goto(url, {waitUntil:'domcontentloaded',timeout:60000});
-    const model = page.locator('#warehouse');
-    await model.scrollIntoViewIfNeeded();
-    await page.waitForFunction(wanted => document.querySelector('#warehouse')?.dataset.sceneState===wanted,
-      fallback?'poster':'ready',{timeout:45000});
+    page.on('console', msg => {if (msg.type()==='error') errors.push(msg.text());});
+    await page.goto(process.env.SITE_URL, {waitUntil:'domcontentloaded'});
+    const yard = page.locator('#warehouse');
+    await yard.scrollIntoViewIfNeeded();
+    await page.locator('#warehouse[data-scene-state="'+(fallback?'frames':'ready')+'"] canvas').waitFor();
+    await page.waitForFunction(()=>document.querySelector('.yard-poster').hidden);
+    const truck = yard.locator('button');
+    const phase = value => page.locator('.model[data-story="'+value+'"]').waitFor();
+    const pixels = async () => createHash('sha256').update(await yard.locator('canvas').screenshot()).digest('hex');
+    const start = await pixels();
+    assert.equal(await page.locator('.dispatch-console,input[type=range]').count(),0);
     assert.equal(await page.locator('.partner-list li').count(),6);
-    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'No horizontal overflow');
-    if(fallback){
-      assert.ok(await model.locator('img').evaluate(img=>img.complete&&img.naturalWidth>0));
-      assert.equal(await page.locator('[data-scene-phase=loading]').isDisabled(),true);
-      await page.screenshot({path:artifacts+'/'+name+'.png'});
-      assert.deepEqual(errors,[]);
-      console.log('PASS',name,'real-photo fallback, disabled 3D controls, client references');
-      return;
-    }
-    await page.waitForFunction(()=>document.querySelector('#warehouse img').style.opacity==='0');
-    const canvas = model.locator('canvas');
-    const signature = async () => digest(await canvas.screenshot());
-    const first = await signature();
-    const changed = async old => {
-      await model.scrollIntoViewIfNeeded();
-      for(let i=0;i<12;i++) {if(await signature()!==old)return;}
-      await page.screenshot({path:artifacts+'/'+name+'-failure.png',fullPage:true});
-      console.log('STATE',await model.evaluate(el=>({state:el.dataset.sceneState,paused:el.dataset.paused,rect:el.getBoundingClientRect().toJSON(),time:document.querySelector('[data-scene-time]').value,scrollY})));
-      assert.fail('Model pixels did not change after the interaction');
-    };
-    await page.locator('[data-camera-angle]').fill('45');await changed(first);
-    const second=await signature();
-    const bounds=await canvas.boundingBox();
-    assert.ok(bounds.width>200 && bounds.height>150);
-    const x=Math.round(bounds.x+bounds.width*.6), y=Math.round(bounds.y+bounds.height*.52);
-    if(mobile){
-      const session=await context.newCDPSession(page);
-      const touch=(type,dx)=>session.send('Input.dispatchTouchEvent',{type,touchPoints:dx===null?[]:[{x:x+dx,y}]});
-      await touch('touchStart',0);for(const dx of [-12,-32,-75,-112])await touch('touchMove',dx);await touch('touchEnd',null);
-      await session.detach();
-    } else {
-      await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x-112,y+1,{steps:12});await page.mouse.up();
-    }
-    await changed(second);
-    const third=await signature();
-    await page.locator('[data-scene-time]').fill('5');await changed(third);
-    assert.equal(await model.getAttribute('data-paused'),'true');
-    assert.match(await page.locator('[data-cycle-time]').textContent(),/00:05/);
-    assert.equal(await page.locator('[data-scene-status]').textContent(),'Příjezd k rampě');
-    await page.locator('[data-dispatch-command]').click();
-    assert.equal(await page.locator('[data-scene-status]').textContent(),'Nakládka palet');
-    await page.locator('[data-dispatch-command]').click();
-    assert.equal(await page.locator('[data-scene-status]').textContent(),'Expedice zásilky');
-    await page.locator('[data-dispatch-command]').click();
-    assert.equal(await page.locator('[data-scene-status]').textContent(),'Příjezd k rampě');
-    await page.locator('[data-expand-model]').click();
-    assert.ok(await page.locator('#model-dialog').evaluate(el=>el.open));
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    await page.waitForTimeout(420);
+    if (reduced) assert.equal(await pixels(),start,'Reduced motion holds until requested');
+    else assert.notEqual(await pixels(),start,'The warehouse moves without input');
+    const body = await truck.boundingBox();
+    assert.ok(body.width>=44 && body.height>=44);
+    const hit = {x:body.x+body.width/2, y:body.y+body.height/2};
+    if (mobile) await page.touchscreen.tap(hit.x,hit.y);
+    else await page.mouse.click(hit.x,hit.y);
+    await phase('ready');
+    assert.equal(await truck.getAttribute('aria-label'),'Naloženo. Poslat kamion na cestu');
+    assert.notEqual(await pixels(),start,'Loading changes the view');
     await page.screenshot({path:artifacts+'/'+name+'.png'});
-    await page.locator('[data-expand-model]').click();
-    await page.locator('main #warehouse').waitFor({state:'visible'});
-    await page.locator('[data-scene-roof]').click();
-    assert.equal(await page.locator('[data-scene-roof]').getAttribute('aria-pressed'),'true');
-    await page.locator('[data-scene-phase=arrival]').click();
-    assert.equal(await model.getAttribute('data-paused'),'false');
-    assert.equal(await page.locator('[data-scene-status]').textContent(),'Příjezd k rampě');
-    const running=await signature();await changed(running);
-    await page.locator('[data-scene-phase=loading]').click();
-    assert.equal(await page.locator('[data-scene-status]').textContent(),'Nakládka palet');
-    await page.locator('[data-scene-phase=dispatch]').click();
-    assert.equal(await page.locator('[data-scene-status]').textContent(),'Expedice zásilky');
-    await page.locator('[data-scene-pause]').click();
-    assert.equal(await model.getAttribute('data-paused'),'true');
+    if (mobile) await truck.locator('.truck-bubble').tap();
+    else {await truck.focus();await page.keyboard.press('Enter');}
+    if (!reduced) await phase('driving');
+    await phase('sent');
+    await phase('idle');
     assert.deepEqual(errors,[]);
-    console.log('PASS',name,'3D scene, camera slider, drag, timeline seek, dispatch commands, enlarged view, cutaway, phases and pause');
-  } finally { await context.close(); }
+    console.log('PASS',name,'truck hit target, load, zoom, dispatch, reset, ambient/reduced motion');
+  } catch (e) {
+    console.error('Scene:',await page.locator('.model').getAttribute('data-story').catch(()=>null));
+    await page.screenshot({path:artifacts+'/'+name+'-failure.png'}).catch(()=>{});
+    throw e;
+  } finally {await context.close();}
 }
 (async()=>{
   const browser=await chromium.launch({executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',headless:true,
     args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--autoplay-policy=no-user-gesture-required']});
   try {
-    await verify(browser,{name:'desktop-webgl',mobile:false,fallback:false});
-    await verify(browser,{name:'mobile-webgl',mobile:true,fallback:false});
-    await verify(browser,{name:'mobile-no-webgl',mobile:true,fallback:true});
-  } finally { await browser.close(); }
-})().catch(e=>{console.error(e);process.exit(1)});
+    await verify(browser,{name:'desktop-webgl',mobile:false,fallback:false,reduced:false});
+    await verify(browser,{name:'mobile-webgl',mobile:true,fallback:false,reduced:false});
+    await verify(browser,{name:'mobile-frames',mobile:true,fallback:true,reduced:false});
+    await verify(browser,{name:'reduced-motion',mobile:false,fallback:true,reduced:true});
+  } finally {await browser.close();}
+})().catch(e=>{console.error(e);process.exit(1);});

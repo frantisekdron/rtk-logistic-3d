@@ -78,38 +78,3 @@ document.getElementById('copy-inquiry').addEventListener('click', async () => {
     field.select();
   }
 });
-
-const filmLink = document.querySelector('.film-link');
-const filmDialog = document.getElementById('orbit-film');
-const orbitVideo = filmDialog.querySelector('video');
-filmLink?.addEventListener('click', event => {
-  if (typeof filmDialog.showModal !== 'function') return;
-  event.preventDefault();
-  if (!orbitVideo.hasAttribute('src')) orbitVideo.src = filmLink.href;
-  filmDialog.showModal();
-  orbitVideo.play().catch(() => {});
-});
-filmDialog.addEventListener('close', () => orbitVideo.pause());
-
-const modelDialog = document.getElementById('model-dialog');
-const modelFigure = document.querySelector('.model');
-const expandModel = document.querySelector('[data-expand-model]');
-const modelAnchor = document.createComment('3D model');
-modelFigure.before(modelAnchor);
-expandModel.addEventListener('click', () => {
-  if (modelDialog.open) {
-    modelDialog.close();
-    return;
-  }
-  modelDialog.append(modelFigure);
-  modelDialog.showModal();
-  expandModel.querySelector('span').textContent = 'Zavřít náhled';
-  expandModel.setAttribute('aria-label','Zavřít velký model');
-  document.getElementById('warehouse').focus({preventScroll:true});
-});
-modelDialog.addEventListener('close', () => {
-  modelAnchor.after(modelFigure);
-  expandModel.querySelector('span').textContent = 'Zvětšit náhled';
-  expandModel.setAttribute('aria-label','Otevřít velký model');
-  expandModel.focus({preventScroll:true});
-});

@@ -1,4 +1,5 @@
 import * as T from './three.module.js';
+import {cycle, truckPoseAt} from './route.js';
 
 const palette = {
   plinth: ['#263137',.45,.48], bevel: ['#44545a',.52,.37], road: ['#4c565a',.02,.91],
@@ -235,20 +236,12 @@ export function buildWarehouse() {
   const gate=group(()=>{b('white',1.3,0,0,2.6,.07,.1);for(let x=.1;x<2.6;x+=.35)b('red',x,0,.06,.16,.08,.025);});gate.position.set(-13.4,1,7.3);
   b('blue',-13.4,.5,7.3,.25,1,.25);
   root.remove(delivered);truck.add(delivered);
-  const cycle=42;
   const lerp=(a,b,p)=>a+(b-a)*Math.max(0,Math.min(1,p));
   const ease=p=>{p=Math.max(0,Math.min(1,p));return p*p*(3-2*p);};
   function update(time){
     const t=((time%cycle)+cycle)%cycle;
-    let x=10.5,z=4.45,a=0;
-    if(t<7){x=lerp(-11,10.5,ease(t/7));z=9;a=Math.PI/2;}
-    else if(t<10){z=9;a=lerp(Math.PI/2,0,ease((t-7)/3));}
-    else if(t<15){z=lerp(9,4.45,ease((t-10)/5));}
-    else if(t<29){z=4.45;}
-    else if(t<33){z=lerp(4.45,9,ease((t-29)/4));}
-    else if(t<36){z=9;a=lerp(0,-Math.PI/2,ease((t-33)/3));}
-    else{x=lerp(10.5,-11,ease((t-36)/6));z=9;a=-Math.PI/2;}
-    truck.position.set(x,0,z);truck.rotation.y=a;
+    const pose=truckPoseAt(t);
+    truck.position.set(pose.x,0,pose.z);truck.rotation.y=pose.heading;
     // A second truck uses the separate outer lane, with no crossing of the loading path.
     const p=(time%32)/32;passing.position.set(lerp(-12,12,p<.5?p*2:2-p*2),0,12.5);passing.rotation.y=p<.5?Math.PI/2:-Math.PI/2;
     const loading=t>=15&&t<29;
