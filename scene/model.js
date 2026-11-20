@@ -186,7 +186,7 @@ export function buildWarehouse() {
   }
   // The loading wing is open toward the courtyard; remove its solid body.
   // Instance is replaced below by wall strips so a forklift can enter the trailer.
-  b('charcoal',10.5,.81,1.38,2.6,.16,.8);
+  b('charcoal',10.5,.81,1.8,2.6,.16,1.6);
   for(const x of [8.9,12.1]){c('yellow',x,.45,1.7,.12,.85,.12);c('charcoal',x,.6,1.7,.125,.14,.125);}
   // Storage visible in cutaway mode, with a clear aisle through the wing.
   for(const z of [-7,-4])for(const x of [-7,-3,1,5]){
