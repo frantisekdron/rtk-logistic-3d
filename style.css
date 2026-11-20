@@ -288,3 +288,4 @@ footer{background:#101719;border-top:0}.footer-inner{min-height:7rem}
 @media(min-width:781px){.model .viewport{width:100%;left:0;aspect-ratio:2.25;min-height:270px}.intro{align-self:center}.dispatch-console{margin-top:.3rem}}
 @media(min-width:1500px){.model .viewport{min-height:320px}}
 @media(min-width:900px){#model-dialog .model{grid-template-columns:minmax(0,1fr) minmax(340px,420px);grid-template-rows:minmax(0,1fr);gap:1.5rem;padding-inline:2rem}#model-dialog .dispatch-console{align-self:center}#model-dialog .viewport{height:100%;min-width:0}#model-dialog .expand-model{right:2rem}}
+@media(max-width:899px){#model-dialog .model{grid-template-columns:minmax(0,1fr)}}
