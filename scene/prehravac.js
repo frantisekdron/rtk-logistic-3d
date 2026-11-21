@@ -97,7 +97,8 @@
     if(!enabled || document.hidden) return;
     if(stage==='ready') return;
     let time=imageTime(now);
-    if(!video.paused && video.readyState>=2 && !video.seeking){
+    const departing=stage==='driving' || stage==='sent';
+    if(!departing && !video.paused && video.readyState>=2 && !video.seeking){
       const clock=video.currentTime%lap;
       if(clock!==lastVideoTime){
         if(lastVideoTime>=0) {useSurface('film');lastProgress=now;}
@@ -116,12 +117,11 @@
     if(stage==='docking' && time>=arrival && time<loaded) phase('loading');
     if(stage==='loading' && (time>=loaded || wrapped)){hold();return;}
     if(stage==='driving' && (time>=lap-1.6 || wrapped)) phase('sent');
-    if(stage==='sent' && wrapped){
+    else if(stage==='sent' && wrapped){
       phase('idle');
-      if(imageName==='odjezd.webp'){
-        if(surface==='image') useImage('provoz.webp');
-        else {imageName='provoz.webp';image.src=file(imageName);}
-      }
+      useImage('provoz.webp');
+      time=0;
+      startVideo(0);
     }
     previous=time;
     follow(time);
@@ -146,7 +146,9 @@
   button.addEventListener('click',()=>{
     if(stage==='ready'){
       phase('driving');previous=loaded;
-      useImage('odjezd.webp',loaded);startVideo(loaded);wake();
+      // Play the dedicated departure clip from its first frame. Some media engines
+      // briefly report video time zero when seeking a paused MP4 back to the dock.
+      useImage('odjezd.webp',loaded);wake();
     } else if(stage==='idle'){
       const t=surface==='film'?video.currentTime%lap:imageTime(performance.now());
       phase(t>=arrival && t<loaded?'loading':'docking');
@@ -159,7 +161,10 @@
   play.addEventListener('click',e=>{e.preventDefault();enable();button.focus({preventScroll:true});});
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden){cancelAnimationFrame(raf);raf=0;}
-    else if(enabled && stage!=='ready'){if(video.paused) startVideo(previous);wake();}
+    else if(enabled && stage!=='ready'){
+      if(video.paused && stage!=='driving' && stage!=='sent') startVideo(previous);
+      wake();
+    }
   });
   window.addEventListener('pageshow',wake);
   window.addEventListener('resize',()=>{if(enabled) follow(stage==='ready'?loaded:previous);});
