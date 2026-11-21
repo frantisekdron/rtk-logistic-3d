@@ -53,7 +53,9 @@
     useSurface('image');
   }
   function imageTime(now) {
-    return (imageOffset+(now-imageStart)/1000)%lap;
+    // rAF timestamps mark the start of the frame and can predate a media switch.
+    const elapsed=Math.max(0,now-imageStart);
+    return (imageOffset+elapsed/1000)%lap;
   }
   function startVideo(at) {
     if(!enabled || !canPlay) return;

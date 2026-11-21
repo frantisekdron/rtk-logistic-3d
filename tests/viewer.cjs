@@ -37,7 +37,7 @@ async function verify(browser, {name, mobile=false, blocked=false, reduced=false
       HTMLMediaElement.prototype.play = () => Promise.reject(new DOMException('Blocked in test','NotAllowedError'));
       HTMLCanvasElement.prototype.getContext = () => null;
     });
-    page.on('pageerror', err => errors.push(err.message));
+    page.on('pageerror', err => errors.push(err.stack || err.message));
     const url = new URL(site);
     url.searchParams.set('v',process.env.GITHUB_SHA || 'test');
     if (direct) url.searchParams.set('animace','1');
