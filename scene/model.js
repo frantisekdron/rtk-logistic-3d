@@ -249,7 +249,7 @@ export function buildWarehouse() {
   const gate=group(()=>{b('white',1.3,0,0,2.6,.07,.1);for(let x=.1;x<2.6;x+=.35)b('red',x,0,.06,.16,.08,.025);});gate.position.set(-13.4,1,7.3);
   b('blue',-13.4,.5,7.3,.25,1,.25);
   root.remove(delivered);truck.add(delivered);
-  function update(time, yardTime=time) {
+  function update(time, yardTime=time, lapPhase) {
     const t=((time%cycle)+cycle)%cycle;
     const pose=truckPoseAt(t), van=vanPoseAt(yardTime);
     truck.position.set(pose.x,0,pose.z); truck.rotation.y=pose.heading;
@@ -264,11 +264,11 @@ export function buildWarehouse() {
     delivered.position.set(0,.93,-1.17);
     gate.rotation.z=1.25*(1-smooth((t-4)/2)+smooth((t-37)/2));
     workers.forEach((worker,i)=>{
-      const angle=yardTime*(i===0?.31:.39)+i*2;
+      const angle=(lapPhase===undefined?yardTime*(i===0?.31:.39):lapPhase*2*Math.PI*(i===0?1:2))+i*2;
       const width=i===0?2.65:1.6, radius=i===2?.35:.39;
       const along=Math.sin(angle)*width, across=Math.cos(angle)*radius;
       const vx=Math.cos(angle)*width, vz=-Math.sin(angle)*radius;
-      const step=yardTime*(i===0?4.7:5.3)+i*1.6;
+      const step=(lapPhase===undefined?yardTime*(i===0?4.7:5.3):lapPhase*2*Math.PI*(i===0?20:23))+i*1.6;
       worker.g.position.set(worker.x+(i===2?across:along),.08+.023*Math.sin(step)**2,worker.z+(i===2?along:across));
       worker.g.rotation.y=Math.atan2(i===2?vz:vx,i===2?vx:vz);
       const swing=Math.sin(step)*.36;

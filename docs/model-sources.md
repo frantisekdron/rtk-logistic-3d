@@ -12,6 +12,6 @@ Pás referencí po aktualizaci podle RTK zahrnuje BAUHAUS, OBI, HORNBACH, Globus
 
 ## Provoz a úpravy
 
-GitHub Pages publikuje kořen větve `main`. Model automaticky přehrává příjezd, nakládku a odjezd. Kliknutí na zelený kamion nebo jeho bublinu přiblíží rampu a zahájí nakládku. Po druhém kliknutí kamion odjede. Stejný postup funguje klávesnicí a bez WebGL. Pohyb vozidel i pracovníků se počítá v každém snímku. Záložní vykreslování bez WebGL používá nasvícené pozadí skladu a dopočítává pohybující se části stejného 3D modelu. Při zapnutém omezení pohybu se scéna sama nehýbe a mezi fázemi přechází ihned.
+GitHub Pages publikuje kořen větve `main`. Areál je vytvořený v `scene/model.js`. Úvodní film v `scene/film/` obsahuje 630 snímků (21 sekund, 30 sn./s). Přehrává se přímo v prohlížeči, včetně animované obrazové alternativy při zakázaném videu nebo JavaScriptu. V interaktivním režimu kliknutí na kamion přihlásí nakládku. U rampy do odjezdu běží samostatná smyčka pracovníků a okolní dopravy. Systémové omezení pohybu nabídne tlačítko pro výslovné spuštění. Přímý přehrávač je na `scene/film/provoz.mp4`.
 
-Kontrola logiky: `node tests/operations.mjs`. Ručně spustitelný GitHub workflow kontroluje publikovaný web v desktopovém, mobilním a záložním režimu.
+Kontrola logiky modelu: `node tests/operations.mjs`. Ručně spustitelný GitHub workflow porovnává snímky zveřejněné stránky v Chromu i WebKitu a ověřuje nakládku, odjezd, přístupnost a záložní přehrávání.

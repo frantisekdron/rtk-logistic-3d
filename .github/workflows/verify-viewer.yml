@@ -5,18 +5,26 @@ permissions:
 jobs:
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
     steps:
       - uses: actions/checkout@v4
       - name: Install browser test driver
         run: npm install --prefix "$RUNNER_TEMP/viewer-test" --no-audit --no-fund playwright-core@1.56.1
-      - name: Test the live GitHub Pages site in Chrome
+      - name: Install WebKit
+        if: matrix.engine == 'webkit'
+        run: node "$RUNNER_TEMP/viewer-test/node_modules/playwright-core/cli.js" install --with-deps webkit
+      - name: Verify animation and truck interactions on GitHub Pages
         env:
           SITE_URL: https://frantisekdron.github.io/rtk-logistic-3d/
+          BROWSER_ENGINE: ${{ matrix.engine }}
         run: NODE_PATH="$RUNNER_TEMP/viewer-test/node_modules" node tests/viewer.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: viewer-screenshots
+          name: viewer-screenshots-${{ matrix.engine }}
           path: viewer-results
           if-no-files-found: ignore

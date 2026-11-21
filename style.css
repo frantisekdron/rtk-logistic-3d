@@ -208,8 +208,16 @@ footer{background:#101719;border-top:0}.footer-inner{min-height:7rem}
 .model{display:grid;align-content:center;align-items:center;justify-content:stretch;align-self:stretch;position:relative;min-width:0;margin:0 calc(-.5 * var(--gutter)) 0 0;padding:0}
 #warehouse{position:relative;width:100%;height:auto;aspect-ratio:600/380;background:none;cursor:default;touch-action:pan-y;isolation:isolate}
 #warehouse:active{cursor:default}
-.yard-poster,#warehouse canvas{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none}
-.yard-poster[hidden]{display:none}
+.yard-stage,.yard-picture,.yard-picture img,.yard-film{position:absolute;inset:0;width:100%;height:100%;display:block}
+.yard-stage{transform-origin:73% 67%;transition:transform 1.1s cubic-bezier(.25,.72,.28,1)}
+.model:is([data-story="loading"],[data-story="ready"]) .yard-stage{transform:scale(1.16)}
+.model:is([data-story="docking"],[data-story="driving"]) .yard-stage{transform:scale(1.07)}
+.yard-film{pointer-events:none;opacity:0;mask:url('scene/film/silueta.png') center/100% 100% no-repeat;-webkit-mask:url('scene/film/silueta.png') center/100% 100% no-repeat}
+#warehouse[data-surface="film"] .yard-film{opacity:1}
+#warehouse[data-surface="film"] .yard-picture{visibility:hidden}
+.yard-play{display:none;position:absolute;bottom:3%;left:50%;transform:translateX(-50%);z-index:3;width:max-content;border:1px solid #5a7266;border-radius:6px;background:#172421;color:#f3faf4;padding:.5rem .85rem;font-weight:650;font-size:.875rem}
+@media(prefers-reduced-motion:reduce){.yard-play{display:block}.yard-stage{transition:none}}
+#warehouse[data-enabled] .yard-play{display:none}
 .truck-target{position:absolute;z-index:2;transform:translate(-50%,-50%);padding:0;border:0;min-width:44px;min-height:44px;background:transparent;outline-offset:3px;touch-action:manipulation;cursor:pointer}
 .truck-target[hidden]{display:none}
 .truck-bubble{position:absolute;top:100%;left:var(--bubble-x,50%);transform:translateX(-50%);display:flex;align-items:center;gap:.5rem;min-height:38px;width:max-content;max-width:88vw;padding:.48rem .85rem .48rem .55rem;border-radius:8px;border:1px solid #67746c;color:#f6f7ee;background:#1d2828;box-shadow:0 4px 16px #08120f66;font:650 .875rem/1.25 var(--type);white-space:nowrap;transition:background .15s,color .15s}
@@ -222,8 +230,6 @@ footer{background:#101719;border-top:0}.footer-inner{min-height:7rem}
 @media(max-width:580px){.model{width:calc(100% + var(--gutter) * 2);margin:0 calc(-1 * var(--gutter)) 1.15rem}.truck-bubble{font-size:.8125rem;min-height:36px}}
 #warehouse{overflow:clip}
 
-.yard-poster{opacity:1;transition:opacity .45s ease-out}
-.yard-poster.painted{opacity:0}
 
 .partner-link.partner-unihobby{background:#ce1723}
 .partner-link.partner-unihobby:hover,.partner-link.partner-unihobby:focus-visible{background:#b5121d}
