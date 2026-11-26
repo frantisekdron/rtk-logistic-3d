@@ -18,11 +18,10 @@ async function verify(browser, {name, mobile=false, blocked=false, reduced=false
   page.setDefaultTimeout(40000);
   const errors = [];
   const yard = page.locator('#warehouse');
-  const truck = yard.locator('.truck-target');
-  const phase = name => page.locator('figure[data-story="'+name+'"]').waitFor();
-  // Hide the moving label in this capture: a pass requires motion in the picture itself.
+  const control = yard.locator('.yard-play');
+  // Measure playback independently of the control or its focus styling.
   const pixels = async () => createHash('sha256').update(await yard.screenshot({
-    style:'.truck-target,.yard-play{opacity:0!important}'
+    style:'.yard-play{opacity:0!important}'
   })).digest('hex');
   async function expectMotion() {
     const first = await pixels();
@@ -44,54 +43,46 @@ async function verify(browser, {name, mobile=false, blocked=false, reduced=false
     await page.goto(url.href,{waitUntil:'load'});
     await yard.scrollIntoViewIfNeeded();
     assert.ok(await yard.locator('img').evaluate(img => img.complete && img.naturalWidth>0));
+    assert.equal(await yard.locator('.truck-target,.truck-bubble').count(),0);
     if (!script) {
-      assert.equal(await truck.isVisible(),false);
+      assert.equal(await control.isVisible(),false);
       await expectMotion();
       console.log('PASS',name,'native animated picture moves with scripts disabled');
       return;
     }
-    await truck.waitFor();
-    if (engine==='chromium' && !blocked) await page.waitForSelector('#warehouse[data-surface="film"]');
-    if (blocked) assert.equal(await yard.getAttribute('data-surface'),'image');
+    assert.equal(await yard.getByRole('button').count(),1);
+    assert.equal((await control.textContent()).trim(),'');
+    assert.equal(await control.locator('use').getAttribute('href'),'#pause');
+    if (!blocked) await page.waitForSelector('#warehouse[data-surface="film"]');
     await expectMotion();
-    if (reduced) {
-      await yard.getByRole('button',{name:'Zastavit animaci'}).click();
-      await page.waitForFunction(()=>{
-        const yard=document.getElementById('warehouse');
-        return yard.querySelector('img').currentSrc.endsWith('/zacatek.webp') &&
-          yard.querySelector('video').paused && yard.dataset.surface==='image';
-      });
-      await yard.locator('img').evaluate(img=>img.decode());
-      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-      const stopped = await pixels();
-      await page.waitForTimeout(450);
-      assert.equal(await pixels(),stopped,'The stop button holds the scene still');
-      await yard.getByRole('button',{name:'Spustit animaci'}).click();
-      await expectMotion();
-      console.log('PASS',name,'default autoplay, manual stop, restart');
-      return;
-    }
-    const box = await truck.boundingBox();
-    assert.ok(box.width>=44 && box.height>=44);
-    const x=box.x+box.width/2, y=box.y+box.height/2;
-    if (mobile) await page.touchscreen.tap(x,y);
-    else await page.mouse.click(x,y);
-    await phase('ready');
-    assert.equal(await truck.getAttribute('aria-label'),'Naloženo. Poslat kamion na cestu');
-    assert.match(await yard.locator('img').getAttribute('src'),/na-rampe\.webp$/);
-    await page.waitForTimeout(1300);
+    const box = await control.boundingBox();
+    const icon = await control.locator('svg').boundingBox();
+    assert.ok(box.width >= 44 && box.height >= 44 && icon.width <= 28);
+    // A tap in the scene must leave playback alone.
+    await yard.click({position:{x:Math.round(box.width*2),y:75}});
+    assert.equal(await control.getAttribute('aria-label'),'Pozastavit animaci');
+    if (mobile) await control.tap();
+    else {await control.focus(); await page.keyboard.press('Space');}
+    assert.equal(await control.locator('use').getAttribute('href'),'#play');
+    assert.equal(await control.getAttribute('aria-label'),'Přehrát animaci');
+    await page.waitForFunction(()=>!document.querySelector('#warehouse video').seeking);
+    await yard.locator('img').evaluate(img=>img.decode());
+    const clock = await yard.locator('video').evaluate(v=>v.currentTime);
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const stopped = await pixels();
+    await page.waitForTimeout(450);
+    assert.equal(await pixels(),stopped,'Pause must freeze the scene');
+    assert.equal(await yard.locator('video').evaluate(v=>v.currentTime),clock);
+    await control.click();
+    assert.equal(await control.locator('use').getAttribute('href'),'#pause');
+    assert.ok(await yard.locator('video').evaluate(v=>v.currentTime) >= clock-.15);
     await expectMotion();
     await page.screenshot({path:artifacts+'/'+name+'.png'});
-    if (mobile) await truck.locator('.truck-bubble').tap();
-    else {await truck.focus(); await page.keyboard.press('Enter');}
-    await phase('driving');
-    await phase('sent');
-    await phase('idle');
     assert.deepEqual(await page.locator('.partner-list img').evaluateAll(imgs => imgs.map(i=>i.alt)),
       ['BAUHAUS','OBI','HORNBACH','Globus','baumax','UNI HOBBY']);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
     assert.deepEqual(errors,[]);
-    console.log('PASS',name,'autoplay, moving pixels, load, moving depot at rest, dispatch and return');
+    console.log('PASS',name,'autoplay, one icon, inert scene, pause and resume');
   } catch (err) {
     console.error('Scene:',await yard.evaluate(el=>({surface:el.dataset.surface,state:el.closest('figure').dataset.story,image:el.querySelector('img').currentSrc,videoTime:el.querySelector('video').currentTime})).catch(()=>null));
     await page.screenshot({path:artifacts+'/'+name+'-failure.png'}).catch(()=>{});
