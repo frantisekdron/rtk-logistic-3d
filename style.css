@@ -209,9 +209,9 @@ footer{background:#101719;border-top:0}.footer-inner{min-height:7rem}
 .yard-film{pointer-events:none;opacity:0;mask:url('scene/film/silueta.png') center/100% 100% no-repeat;-webkit-mask:url('scene/film/silueta.png') center/100% 100% no-repeat}
 #warehouse[data-surface="film"] .yard-film{opacity:1}
 #warehouse[data-surface="film"] .yard-picture{visibility:hidden}
-.yard-play{display:none;position:absolute;bottom:3%;left:50%;transform:translateX(-50%);z-index:3;width:max-content;border:1px solid #5a7266;border-radius:6px;background:#172421;color:#f3faf4;padding:.5rem .85rem;font-weight:650;font-size:.875rem}
-@media(prefers-reduced-motion:reduce){.yard-play{display:block}.yard-stage{transition:none}}
-#warehouse[data-enabled] .yard-play{display:none}
+.yard-play{position:absolute;top:3%;right:3%;z-index:3;min-height:44px;border:1px solid #5a7266;border-radius:6px;background:#172421;color:#f3faf4;padding:.5rem .85rem;font-weight:650;font-size:.875rem}
+.yard-play:focus-visible{outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.yard-stage{transition:none}}
 .truck-target{position:absolute;z-index:2;transform:translate(-50%,-50%);padding:0;border:0;min-width:44px;min-height:44px;background:transparent;outline-offset:3px;touch-action:manipulation;cursor:pointer}
 .truck-target[hidden]{display:none}
 .truck-bubble{position:absolute;top:100%;left:var(--bubble-x,50%);transform:translateX(-50%);display:flex;align-items:center;gap:.5rem;min-height:38px;width:max-content;max-width:88vw;padding:.48rem .85rem .48rem .55rem;border-radius:8px;border:1px solid #67746c;color:#f6f7ee;background:#1d2828;box-shadow:0 4px 16px #08120f66;font:650 .875rem/1.25 var(--type);white-space:nowrap;transition:background .15s,color .15s}

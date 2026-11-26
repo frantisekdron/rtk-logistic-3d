@@ -18,7 +18,7 @@ async function verify(browser, {name, mobile=false, blocked=false, reduced=false
   page.setDefaultTimeout(40000);
   const errors = [];
   const yard = page.locator('#warehouse');
-  const truck = yard.locator('button');
+  const truck = yard.locator('.truck-target');
   const phase = name => page.locator('figure[data-story="'+name+'"]').waitFor();
   // Hide the moving label in this capture: a pass requires motion in the picture itself.
   const pixels = async () => createHash('sha256').update(await yard.screenshot({
@@ -50,18 +50,25 @@ async function verify(browser, {name, mobile=false, blocked=false, reduced=false
       console.log('PASS',name,'native animated picture moves with scripts disabled');
       return;
     }
-    if (reduced && !direct) {
-      const before = await pixels();
-      await page.waitForTimeout(450);
-      assert.equal(await pixels(),before,'Reduced motion starts still');
-      await yard.getByRole('link',{name:'Přehrát provoz skladu'}).click();
-    }
     await truck.waitFor();
     if (engine==='chromium' && !blocked) await page.waitForSelector('#warehouse[data-surface="film"]');
     if (blocked) assert.equal(await yard.getAttribute('data-surface'),'image');
     await expectMotion();
     if (reduced) {
-      console.log('PASS',name,'motion enabled by explicit choice');
+      await yard.getByRole('button',{name:'Zastavit animaci'}).click();
+      await page.waitForFunction(()=>{
+        const yard=document.getElementById('warehouse');
+        return yard.querySelector('img').currentSrc.endsWith('/zacatek.webp') &&
+          yard.querySelector('video').paused && yard.dataset.surface==='image';
+      });
+      await yard.locator('img').evaluate(img=>img.decode());
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+      const stopped = await pixels();
+      await page.waitForTimeout(450);
+      assert.equal(await pixels(),stopped,'The stop button holds the scene still');
+      await yard.getByRole('button',{name:'Spustit animaci'}).click();
+      await expectMotion();
+      console.log('PASS',name,'default autoplay, manual stop, restart');
       return;
     }
     const box = await truck.boundingBox();

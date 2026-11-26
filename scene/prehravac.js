@@ -6,13 +6,11 @@
   const video=yard.querySelector('video');
   const picture=yard.querySelector('picture');
   const image=picture.querySelector('img');
-  const reducedSource=picture.querySelector('source');
-  const button=yard.querySelector('button');
+  const button=yard.querySelector('.truck-target');
   const line=button.querySelector('.truck-line');
   const icon=button.querySelector('use');
   const play=yard.querySelector('.yard-play');
   const status=document.getElementById('yard-status');
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
   const folder=new URL('scene/film/',document.baseURI);
   const file=name=>new URL(name,folder).href;
   const lap=21, arrival=5.5, loaded=12.5;
@@ -133,15 +131,17 @@
   function enable() {
     if(enabled)return;
     enabled=true;yard.dataset.enabled='';
-    reducedSource.media='not all';button.hidden=false;
+    button.hidden=false;
+    play.textContent='Zastavit animaci';
     phase('idle');useImage('provoz.webp');follow(0);previous=0;
     startVideo(0);wake();
   }
-  function pauseForPreference() {
+  function stop() {
     enabled=false;delete yard.dataset.enabled;
     cancelAnimationFrame(raf);raf=0;video.pause();button.hidden=true;
-    reducedSource.media='(prefers-reduced-motion: reduce)';
-    phase('idle');useImage('provoz.webp');
+    phase('idle');useImage('zacatek.webp');
+    status.textContent='';
+    play.textContent='Spustit animaci';
   }
   button.addEventListener('click',()=>{
     if(stage==='ready'){
@@ -158,7 +158,7 @@
       wake();
     }
   });
-  play.addEventListener('click',e=>{e.preventDefault();enable();button.focus({preventScroll:true});});
+  play.addEventListener('click',()=>{if(enabled) stop(); else enable();});
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden){cancelAnimationFrame(raf);raf=0;}
     else if(enabled && stage!=='ready'){
@@ -168,8 +168,6 @@
   });
   window.addEventListener('pageshow',wake);
   window.addEventListener('resize',()=>{if(enabled) follow(stage==='ready'?loaded:previous);});
-  const preferenceChanged=()=>{if(reduce.matches)pauseForPreference();else enable();};
-  if(reduce.addEventListener)reduce.addEventListener('change',preferenceChanged);
-  else if(reduce.addListener)reduce.addListener(preferenceChanged);
-  if(!reduce.matches || new URLSearchParams(location.search).get('animace')==='1')enable();
+  enable();
+  play.hidden=false;
 })();
