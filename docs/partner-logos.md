@@ -1,6 +1,6 @@
 # Originální loga partnerů
 
-Získáno 20. 11. 2026 z oficiálních zdrojů jednotlivých značek. Geometrie a barvy log jsou zachovány, na stránce se mění pouze zobrazená velikost se zachováním poměru stran.
+Získáno 20. 11. 2026 z oficiálních zdrojů jednotlivých značek. Geometrie log a poměr stran vycházejí z oficiálních podkladů. Loga baumax a UNI HOBBY používají na přání klienta červenou barvu původních dlaždic na bílém pozadí.
 
 - **bauhaus**: https://www.bauhaus.cz/assets/logo_bauhaus_CZ.svg
 - **hornbach**: https://media.hornbach.cz/webshop-commons/654/images/logo.cs-CZ.v1.svg

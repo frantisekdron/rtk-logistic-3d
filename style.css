@@ -196,12 +196,6 @@ footer{background:#101719;border-top:0}.footer-inner{min-height:7rem}
 @media(max-width:1050px){.partner-link{padding-inline:.7rem}.partner-link img{height:36px}.partner-link.partner-globus img{height:46px}.partner-link.partner-globus{padding-block:.94rem}}
 @media(max-width:780px){.partner-list{gap:0}.partner-list li:nth-child(3){border-right:0}.partner-list li:nth-child(-n+3){border-bottom:1px solid #e0e5e5}.partner-link{min-height:98px}.partners{padding-block:1.7rem 2rem}.partner-visit{opacity:1}.facts-inner{padding-block:1.7rem}.site-picture{box-shadow:8px 8px 0 var(--brand)}}
 @media(max-width:580px){.partners-heading h2{font-size:1.45rem}.partner-link img{height:32px}.partner-link.partner-globus img{height:44px}.services summary{gap:.65rem;font-size:1.08rem}.services .detail-body{padding-left:0}.services summary .service-icon{width:1.25rem;height:1.25rem}.timeline{margin-top:.7rem;padding-left:1.25rem}.timeline>div:before{left:-1.65rem}.contact address{border-left:0;border-top:1px solid #087123;padding:1.5rem 0 0}.area-grid{padding-right:calc(var(--gutter) + 8px)}}
-/* baumax supplies a yellow mark intended for its red brand surface. */
-.partner-link.partner-baumax{background:#e21e26}
-.partner-link.partner-baumax:hover,.partner-link.partner-baumax:focus-visible{background:#c91c23}
-.partner-baumax .partner-visit{color:#fff}
-
-
 /* The truck is the control. Its target follows the projected body in both renderers. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .hero-inner{grid-template-columns:minmax(0,.82fr) minmax(0,1.35fr);gap:.7rem}
@@ -231,9 +225,80 @@ footer{background:#101719;border-top:0}.footer-inner{min-height:7rem}
 #warehouse{overflow:clip}
 
 
-.partner-link.partner-unihobby{background:#ce1723}
-.partner-link.partner-unihobby:hover,.partner-link.partner-unihobby:focus-visible{background:#b5121d}
-.partner-unihobby .partner-visit{color:white}
 .partner-unihobby img{max-width:148px}
 .partner-obi img{height:58px}
 .truck-bubble .ico,.timeline b{color:#57c976}
+
+.safety {
+  display: grid;
+  grid-template-columns: minmax(9rem, 13rem) minmax(0, 45rem);
+  gap: clamp(1.4rem, 4vw, 4rem);
+  align-items: center;
+  margin-top: clamp(2.5rem, 5vw, 5rem);
+  padding-top: clamp(2rem, 4vw, 3.5rem);
+  border-top: 1px solid #405056;
+}
+.safety img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+.safety h3, .fleet-inventory h3 {
+  margin: 0;
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -.035em;
+}
+.safety p, .fleet-intro p {
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+.safety p { margin-top: .8rem; color: #c6d1d3; }
+.fleet { background: #fff; color: #162125; }
+.fleet-grid {
+  display: grid;
+  grid-template-columns: 1.12fr 1fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: start;
+}
+.fleet-intro h2 { margin: 0 0 1rem; }
+.fleet-intro p { max-width: 38rem; color: #46565b; }
+.fleet-intro img { width: 100%; height: auto; margin-top: 1.8rem; border-radius: 6px; }
+.fleet-inventory h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: .65rem;
+  border-bottom: 2px solid var(--brand);
+}
+.fleet-inventory h3 span { color: #00732a; font-variant-numeric: tabular-nums; }
+.fleet-inventory dl { margin: 0; }
+.fleet-inventory dl + h3 { margin-top: 1.8rem; }
+.fleet-inventory dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #dce3e1;
+  padding-block: .48rem;
+}
+.fleet-inventory dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 950px) and (min-width: 781px) {
+  .navbar { gap: .65rem; }
+  .navbar nav { gap: .7rem; }
+  .navbar nav a { font-size: .86rem; }
+}
+@media (max-width: 780px) {
+  .fleet-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 580px) {
+  .safety { grid-template-columns: 1fr; }
+  .safety img { max-height: 13rem; object-fit: cover; object-position: 50% 72%; }
+  .safety > div { grid-row: 1; }
+}
+@media (max-width: 365px) {
+  .navbar .brand-type { flex-direction: column; align-items: start; gap: .1rem; }
+  .navbar .brand-type > span { align-self: start; }
+  .timeline > div { grid-template-columns: 4.1rem 1fr; }
+}
